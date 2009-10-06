@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+
+<!--
+ * Copyright 2009 Tim Vernum
+-->
+
+<project name="org.adjective.stout" default="all" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>
+        Stout : Java ByteCode Generator
+    </description>
+
+    <property name="source.version.properties"  location="source/ant/version.properties" />
+    <property file="${source.version.properties}" />
+    <property name="project.name" value="stout" />
+
+    <property name="compile.debug"    value="true" />
+    <property name="compile.list"     value="true" />
+    <property name="compile.optimize" value="false" />
+
+    <property name="source.dir.name"  value="source" />
+    <property name="source.dir"       location="${source.dir.name}" />
+
+    <property name="source.java.dir"               location="${source.dir}/java" />
+    <property name="source.java.core.dir"          location="${source.java.dir}/core" />
+    <property name="source.java.test.dir"          location="${source.java.dir}/test" />
+
+    <property name="source.doc.guide.dir"          location="${source.dir}/doc/user-guide" />
+
+    <property name="source.javadoc.dir"            location="${source.dir}/doc/javadoc" />
+    <property name="source.javadoc.package.j2se"   location="${source.javadoc.dir}/j2se" />
+
+    <property name="output.dir"                    location="output/ant" />
+
+    <property name="output.class.dir"              location="${output.dir}/classes" />
+    <property name="output.class.core.dir"         location="${output.class.dir}/core" />
+    <property name="output.class.test.dir"         location="${output.class.dir}/test" />
+
+    <property name="output.report.dir"             location="${output.dir}/report" />
+    <property name="output.report.junit.dir"       location="${output.report.dir}/junit" />
+
+    <property name="output.jar.dir"                location="${output.dir}/jar" />
+    <property name="output.jar.core.name"          value="${ant.project.name}.jar" />
+    <property name="output.jar.core.file"          location="${output.jar.dir}/${output.jar.core.name}" />
+
+    <property name="output.doc.dir.name"           value="docs" />
+    <property name="output.doc.dir"                location="${output.dir}/${output.doc.dir.name}" />
+    <property name="output.doc.guide.dir"          location="${output.doc.dir}/user-guide" />
+    <property name="output.doc.api.dir"            location="${output.doc.dir}/api" />
+
+    <property name="output.dist.dir"               location="${output.dir}/dist" />
+
+    <property name="output.dist.all.name"          value="${ant.project.name}-${project.version}-all.zip" />
+    <property name="output.dist.all.file"          location="${output.dist.dir}/${output.dist.all.name}" />
+
+    <property name="lib.jar.dir.name"              value="lib/" />
+    <property name="lib.jar.dir"                   location="${lib.jar.dir.name}" />
+
+    <path id="build.core.classpath">
+        <fileset dir="${lib.jar.dir}">
+            <include name="asm-*" />
+            <include name="slf-*" />
+        </fileset>
+    </path>
+
+    <path id="build.test.classpath">
+        <path refid="build.core.classpath" />
+        <pathelement location="${output.class.core.dir}" />
+        <fileset dir="${lib.jar.dir}">
+            <include name="junit*.jar" />
+        </fileset>
+    </path>
+
+    <path id="run.test.classpath">
+        <path refid="build.test.classpath" />
+        <pathelement location="${output.class.test.dir}" />
+    </path>
+
+    <import file="source/ant/install-ivy.xml" />
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          Public Targets  
+       - - - - - - - - - - - - - - - - - -->
+    <target name="all"
+            depends="init, compile, test, jar, docs, dist"
+            description="Compile, test, and generate a full distribution" />
+
+    <target name="clean" depends="clean.dirs" description="Delete all build artefacts" />
+    <target name="init"  depends="init.libs, init.mkdirs, init.available" />
+    <target name="compile"
+            depends="init, compile.core, compile.test"
+            description="Compile all source code" />
+
+    <target name="test"    depends="compile, test.run" description="Run junit tests" />
+    <target name="jar" depends="compile, jar.build" description="Build output jar" />
+    <target name="docs" depends="docs.javadoc" description="Generate documentation" />
+
+    <target name="dist"
+            depends="jar, docs, dist.build"
+            description="Generate distribution" />
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          Private Targets
+       - - - - - - - - - - - - - - - - - -->
+
+    <target name="init.libs" depends="init.ivy" >
+        <ivy:resolve file="source/ant/ivy.xml" type="jar" />
+        <ivy:retrieve type="jar"  />
+    </target>
+
+    <target name="clean.dirs">
+        <delete dir="${output.class.core.dir}" />
+        <delete dir="${output.class.test.dir}" />
+        <delete dir="${output.class.dir}" />
+        <delete dir="${output.report.junit.dir}" />
+        <delete dir="${output.jar.dir}" />
+        <delete dir="${output.doc.api.dir}" />
+        <delete dir="${output.doc.dir}" />
+        <delete dir="${output.dist.dir}" />
+        <delete dir="${output.dir}" />
+    </target>
+
+    <target name="init.mkdirs">
+        <mkdir dir="${output.dir}" />
+        <mkdir dir="${output.class.dir}" />
+        <mkdir dir="${output.class.core.dir}" />
+        <mkdir dir="${output.class.test.dir}" />
+        <mkdir dir="${output.report.junit.dir}" />
+        <mkdir dir="${output.jar.dir}" />
+        <mkdir dir="${output.doc.dir}" />
+        <mkdir dir="${output.doc.api.dir}" />
+        <mkdir dir="${output.dist.dir}" />
+    </target>
+
+    <target name="init.available">
+        <!-- TODO 
+        <available property="available.task.checkstyle" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask">
+            <classpath refid="run.test.classpath" />
+        </available>
+        -->
+    </target>
+
+    <target name="compile.core">
+        <javac srcdir="${source.java.core.dir}"
+               destdir="${output.class.core.dir}"
+               classpathref="build.core.classpath"
+               debug="${compile.debug}"
+               listfiles="${compile.list}"
+               optimize="${compile.optimize}"
+               source="1.5">
+        </javac>
+    </target>
+
+    <target name="compile.test">
+        <javac srcdir="${source.java.test.dir}"
+               destdir="${output.class.test.dir}"
+               classpathref="build.test.classpath"
+               debug="${compile.debug}"
+               listfiles="${compile.list}"
+               optimize="${compile.optimize}"
+               source="1.5" >
+        </javac>
+    </target>
+
+    <target name="test.run">
+        <junit fork="once" failureproperty="test.fail" >
+            <batchtest todir="${output.report.junit.dir}">
+                <fileset dir="${output.class.test.dir}">
+                    <include name="**/*Test.class" />
+                </fileset>
+                <formatter type="plain" />
+                <formatter type="brief" usefile="no" />
+            </batchtest>
+            <classpath refid="run.test.classpath" />
+        </junit>
+        <fail message="JUnit test(s) failed" if="test.fail" />
+    </target>
+
+    <target name="metrics.checkstyle" if="available.task.checkstyle">
+        <taskdef name="checkstyle" classname="com.puppycrawl.tools.checkstyle.CheckStyleTask">
+            <classpath refid="run.test.classpath" />
+        </taskdef>
+
+        <echo message="Checkstyle: ${source.java.core.dir}" />
+        <checkstyle config="${source.checkstyle.rules.core}" >
+            <fileset dir="${source.java.core.dir}" />
+            <property key="checkstyle.cache.file" file="${output.tmp.dir}/checkstyle.core.cache"/>
+            <property key="checkstyle.suppressions.file" file="${source.checkstyle.suppressions.core}"/>
+            <formatter type="plain"/>
+            <formatter type="xml" toFile="${output.report.metrics.dir}/checkstyle.core.xml"/>
+        </checkstyle>
+
+        <echo message="Checkstyle: ${source.java.test.dir}" />
+        <checkstyle config="${source.checkstyle.rules.test}" >
+            <fileset dir="${source.java.test.dir}" />
+            <property key="checkstyle.cache.file" file="${output.tmp.dir}/checkstyle.test.cache"/>
+            <property key="checkstyle.suppressions.file" file="${source.checkstyle.suppressions.test}"/>
+            <formatter type="plain"/>
+            <formatter type="xml" toFile="${output.report.metrics.dir}/checkstyle.test.xml"/>
+        </checkstyle>
+    </target>
+
+    <target name="jar.build">
+        <copy todir="${output.class.core.dir}/biz/squint/" file="${source.version.properties}" />
+        <jar destfile="${output.jar.core.file}">
+            <fileset dir="${output.class.core.dir}" />
+        </jar>
+    </target>
+
+    <target name="docs.guide">
+        <copy todir="${output.doc.guide.dir}">
+            <fileset dir="${source.doc.guide.dir}" excludes="**/*.swp,**/*.swo" />
+        </copy>
+    </target>
+
+    <target name="docs.javadoc">
+        <javadoc access="protected" author="true" destdir="${output.doc.api.dir}">
+            <fileset dir="${source.java.core.dir}" />
+            <link offline="true"
+                  href="http://java.sun.com/j2se/1.5.0/docs/api/"
+                  packagelistloc="${source.javadoc.package.j2se}" />
+            <classpath refid="build.core.classpath" />
+        </javadoc>
+    </target>
+
+    <target name="dist.build">
+        <zip destfile="${output.dist.all.file}">
+            <zipfileset prefix="${project.name}" dir=".">
+                <include name="${source.dir.name}/**" />
+                <exclude name="**/*.swp" />
+            </zipfileset>
+            <zipfileset prefix="${project.name}" dir=".">
+                <type type="file"/> 
+                <include name="*" />
+            </zipfileset>
+            <zipfileset prefix="${project.name}" dir="${output.dir}">
+                <include name="${output.doc.dir.name}/**" />
+                <exclude name="**/*.swp" />
+            </zipfileset>
+            <zipfileset prefix="${project.name}" dir="${output.jar.dir}" />
+        </zip>
+    </target>
+
+</project>
+
+
+<!-- vim: set ts=4 sw=4 sts=4 et: -->
+

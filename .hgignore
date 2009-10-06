@@ -1,0 +1,8 @@
+syntax: regexp
+^lib
+^output
+^samples
+^\.settings
+.*\.swp
+/\.DS_Store
+^\.DS_Store
