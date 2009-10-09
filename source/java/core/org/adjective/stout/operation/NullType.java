@@ -15,39 +15,37 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.loop;
+package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.operation.Expression;
+import org.objectweb.asm.Type;
+
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class NullType implements UnresolvedType
 {
-    public ForLoopSpec forLoop()
+    public static final NullType INSTANCE = new NullType();
+
+    public boolean canAssignTo(UnresolvedType type)
     {
-        return new ForLoopSpec();
+        return type.getSort() != Sort.PRIMITIVE;
     }
 
-    public WhileLoopSpec whileLoop()
+    public String getDescriptor()
     {
-        return new WhileLoopSpec();
+        return Type.getDescriptor(Object.class);
     }
 
-    public ElementBuilder<Condition> always()
+    public String getInternalName()
     {
-        return AlwaysCondition.INSTANCE;
+        return Type.getInternalName(Object.class);
     }
 
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
+    public Sort getSort()
     {
-        return expression(variable.create());
-    }
-
-    public ElementBuilder<Condition> expression(Expression expression)
-    {
-        return new ExpressionCondition(expression);
+        return Sort.CLASS;
     }
 
 }

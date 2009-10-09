@@ -15,7 +15,7 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
+package org.adjective.stout.instruction;
 
 import org.objectweb.asm.Type;
 
@@ -24,51 +24,54 @@ import org.adjective.stout.core.UnresolvedType;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class ArrayType implements UnresolvedType
+public enum TypeDescriptor
 {
-    private final UnresolvedType _componentType;
+    VOID('V'), BOOLEAN('Z'), CHAR('C'), BYTE('B'), SHORT('S'), INT('I'), FLOAT('F'), LONG('J'), DOUBLE('D'), ARRAY('['), OBJECT('L');
 
-    public ArrayType(UnresolvedType componentType)
+    private final char _code;
+
+    private TypeDescriptor(char code)
     {
-        _componentType = componentType;
+        _code = code;
     }
 
-    public String getDescriptor()
+    public char getCode()
     {
-        return "[" + _componentType.getDescriptor();
+        return _code;
     }
 
-    public String getInternalName()
+    public boolean isType(Type type)
     {
-        return getDescriptor();
+        return type.getDescriptor().charAt(0) == _code;
     }
 
-    public Sort getSort()
+    public boolean isType(UnresolvedType type)
     {
-        return Sort.ARRAY;
+        return type.getDescriptor().charAt(0) == _code;
     }
 
-    public boolean canAssignTo(UnresolvedType type)
+    public boolean isCompatible(UnresolvedType type)
     {
-        if (isObject(type))
+        if (isType(type))
         {
             return true;
         }
-        if (type.getSort() != Sort.ARRAY)
+        switch (this)
         {
-            return false;
+            case BOOLEAN:
+            case BYTE:
+            case SHORT:
+            case INT:
+                switch (type.getDescriptor().charAt(0))
+                {
+                    case 'Z':
+                    case 'B':
+                    case 'S':
+                    case 'I':
+                        return true;
+                }
+                break;
         }
-        if (_componentType.getSort() == Sort.PRIMITIVE)
-        {
-            return this.getDescriptor().equals(type.getDescriptor());
-        }
-        // @TODO - Not really true, but a good start..
-        return true;
+        return false;
     }
-
-    private boolean isObject(UnresolvedType type)
-    {
-        return Type.getInternalName(Object.class).equals(type.getInternalName());
-    }
-
 }

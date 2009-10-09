@@ -85,7 +85,7 @@ public class MethodImpl implements MethodDescriptor
 
     public UnresolvedType[] getParameterTypes()
     {
-        UnresolvedType[] types = new ExtendedType[_parameters.length]; 
+        UnresolvedType[] types = new ExtendedType[_parameters.length];
         for (int i = 0; i < types.length; i++)
         {
             types[i] = _parameters[i].getType();
@@ -96,6 +96,31 @@ public class MethodImpl implements MethodDescriptor
     public ExtendedType[] getExceptions()
     {
         return _exceptions;
+    }
+
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(_returnType);
+        builder.append(' ');
+        builder.append(_name);
+        if (_parameters.length > 0)
+        {
+            builder.append('(');
+            for (Parameter param : _parameters)
+            {
+                builder.append(param.getType());
+                builder.append(' ');
+                builder.append(param.getName());
+                builder.append(',');
+            }
+            builder.setCharAt(builder.length() - 1, ')');
+        }
+        else
+        {
+            builder.append("( )");
+        }
+        return builder.toString();
     }
 
 }

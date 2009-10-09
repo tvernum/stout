@@ -15,39 +15,32 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.loop;
+package org.adjective.stout.tools;
 
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.operation.Expression;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.objectweb.asm.ClassReader;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class StackVisualiser 
 {
-    public ForLoopSpec forLoop()
+    public static void main(String[] args) throws IOException
     {
-        return new ForLoopSpec();
-    }
+        if (args.length != 2)
+        {
+            throw new RuntimeException("Usage: <java> " + StackVisualiser.class.getName() + " <class-file> <method>");
+        }
 
-    public WhileLoopSpec whileLoop()
-    {
-        return new WhileLoopSpec();
-    }
+        File classFile = new File(args[0]);
+        String method = args[1];
 
-    public ElementBuilder<Condition> always()
-    {
-        return AlwaysCondition.INSTANCE;
+        InputStream input = new FileInputStream(classFile);
+        ClassReader reader = new ClassReader(input);
+        reader.accept(new StackVisualiserClassVisitor(method, System.out), ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
     }
-
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
-    {
-        return expression(variable.create());
-    }
-
-    public ElementBuilder<Condition> expression(Expression expression)
-    {
-        return new ExpressionCondition(expression);
-    }
-
 }

@@ -17,37 +17,44 @@
 
 package org.adjective.stout.loop;
 
+import java.util.Collection;
+
 import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.operation.Expression;
+import org.adjective.stout.operation.Statement;
+import org.adjective.stout.operation.StatementOperations;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class WhileLoopSpec implements ElementBuilder<WhileLoop>
 {
-    public ForLoopSpec forLoop()
+    private Statement[] _body;
+    private Condition _condition;
+
+    public WhileLoop create()
     {
-        return new ForLoopSpec();
+        return new WhileLoop(_condition, _body);
     }
 
-    public WhileLoopSpec whileLoop()
+    public WhileLoopSpec withCondition(ElementBuilder<Condition> condition)
     {
-        return new WhileLoopSpec();
+        return withCondition(condition.create());
     }
 
-    public ElementBuilder<Condition> always()
+    public WhileLoopSpec withCondition(Condition condition)
     {
-        return AlwaysCondition.INSTANCE;
+        _condition = condition;
+        return this;
     }
 
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
+    public WhileLoopSpec withBody(Collection< ? extends ElementBuilder< ? extends Statement>> body)
     {
-        return expression(variable.create());
+        return withBody(StatementOperations.toStatementArray(body));
     }
 
-    public ElementBuilder<Condition> expression(Expression expression)
+    public WhileLoopSpec withBody(Statement[] body)
     {
-        return new ExpressionCondition(expression);
+        _body = body;
+        return this;
     }
-
 }

@@ -17,6 +17,8 @@
 
 package org.adjective.stout.operation;
 
+import org.objectweb.asm.util.AbstractVisitor;
+
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.Operation;
 
@@ -28,5 +30,19 @@ public abstract class SmartOperation implements ElementBuilder<Operation>, Opera
     public Operation create()
     {
         return this;
+    }
+
+    protected String getOpcodeDescription(int op)
+    {
+        if (op < 0 || op >= AbstractVisitor.OPCODES.length)
+        {
+            return "Invalid Opcode " + op;
+        }
+        String desc = AbstractVisitor.OPCODES[op];
+        if (desc == null || desc.length() == 0)
+        {
+            return "Unnamed Opcode " + op;
+        }
+        return desc;
     }
 }

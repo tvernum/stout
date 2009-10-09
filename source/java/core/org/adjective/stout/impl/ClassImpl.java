@@ -21,10 +21,12 @@ import java.util.Set;
 
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.ElementModifier;
+import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.ParameterisedClass;
 import org.adjective.stout.core.TypeParameter;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -82,7 +84,7 @@ public class ClassImpl implements ClassDescriptor
     {
         return _interfaces;
     }
-    
+
     public FieldDescriptor[] getFields()
     {
         return _fields;
@@ -106,6 +108,26 @@ public class ClassImpl implements ClassDescriptor
     public Sort getSort()
     {
         return Sort.CLASS;
+    }
+
+    public boolean canAssignTo(UnresolvedType type)
+    {
+        if (getDescriptor().equals(type.getDescriptor()))
+        {
+            return true;
+        }
+        if (_superClass.canAssignTo(type))
+        {
+            return true;
+        }
+        for (ExtendedType ifc : _interfaces)
+        {
+            if (ifc.canAssignTo(type))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

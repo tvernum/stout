@@ -17,6 +17,7 @@
 
 package org.adjective.stout.operation;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -41,6 +42,18 @@ public class StatementOperations
         for (int i = 0; i < builders.length; i++)
         {
             statements[i] = builders[i].create();
+        }
+        return statements;
+    }
+
+    public static Statement[] toStatementArray(Collection<? extends ElementBuilder<? extends Statement>> builders)
+    {
+        int i = 0;
+        Statement[] statements = new Statement[builders.size()];
+        for (ElementBuilder<? extends Statement> builder : builders)
+        {
+            statements[i] = builder.create();
+            i++;
         }
         return statements;
     }

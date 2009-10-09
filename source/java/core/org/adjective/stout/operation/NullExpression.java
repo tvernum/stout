@@ -23,7 +23,6 @@ import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.instruction.GenericInstruction;
 
 /**
@@ -38,7 +37,7 @@ public class NullExpression extends SmartExpression implements ElementBuilder<Ex
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        return new ParameterisedClassImpl(Object.class);
+        return NullType.INSTANCE;
     }
 
 }

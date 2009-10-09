@@ -21,7 +21,11 @@ import org.objectweb.asm.Opcodes;
 
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
+import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.MethodSignature;
+import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.exception.OperationException;
 import org.adjective.stout.instruction.GenericInstruction;
 
 /**
@@ -42,8 +46,39 @@ public class ReturnObjectStatement extends SmartStatement implements ElementBuil
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
+        checkReturnType(stack);
         _object.getInstructions(stack, collector);
         collector.add(new GenericInstruction(Opcodes.ARETURN));
+    }
+
+    private void checkReturnType(ExecutionStack stack)
+    {
+        MethodSignature method = stack.currentMethod();
+        ExtendedType returnType = method.getReturnType();
+        UnresolvedType objectType = _object.getExpressionType(stack);
+        if (returnType.getSort() == UnresolvedType.Sort.PRIMITIVE)
+        {
+            throw new OperationException("Attempt to return object from a method (" + method + ") that returns a primitive (" + returnType + ")");
+        }
+        if (objectType.getSort() == UnresolvedType.Sort.PRIMITIVE)
+        {
+            throw new OperationException("Attempt to return primitive " + objectType + " as an Object");
+        }
+        if (objectType.getDescriptor().equals(returnType.getDescriptor()))
+        {
+            return;
+        }
+        if (!objectType.canAssignTo(returnType))
+        {
+            throw new OperationException("Attempt to return type "
+                    + objectType
+                    + " ("
+                    + _object
+                    + ") in method ("
+                    + method
+                    + ") returning "
+                    + returnType);
+        }
     }
 
 }

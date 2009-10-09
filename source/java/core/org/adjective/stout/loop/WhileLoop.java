@@ -31,45 +31,34 @@ import org.adjective.stout.operation.Statement;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class ForLoop extends SmartStatement
+public class WhileLoop extends SmartStatement
 {
-    private final Statement _initialiser;
     private final Condition _condition;
-    private final Statement _increment;
     private final Statement[] _body;
 
-    public ForLoop(Statement initialiser, Condition condition, Statement increment, Statement[] body)
+    public WhileLoop(Condition condition, Statement[] body)
     {
-        _initialiser = initialiser;
         _condition = condition;
-        _increment = increment;
         _body = body;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         stack.pushBlock();
-        _initialiser.getInstructions(stack, collector);
 
-        Label startLoop = new Label();
-        collector.add(new LabelInstruction(startLoop));
-
+        Label nextLoop = new Label();
+        collector.add(new LabelInstruction(nextLoop));
         Label endLoop = new Label();
         _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
-        
-        Label nextLoop = new Label();
-        Block block = stack.pushBlock(nextLoop, endLoop);
 
+        Block block = stack.pushBlock(nextLoop, endLoop);
         for (Statement stmt : _body)
         {
             stmt.getInstructions(stack, collector);
         }
         stack.popBlock(block);
 
-        collector.add(new LabelInstruction(nextLoop));
-        _increment.getInstructions(stack, collector);
-        collector.add(new JumpInstruction(Opcodes.GOTO, startLoop));
-        
+        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
         collector.add(new LabelInstruction(endLoop));
     }
 

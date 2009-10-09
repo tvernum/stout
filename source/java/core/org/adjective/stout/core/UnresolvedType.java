@@ -28,4 +28,5 @@ public interface UnresolvedType
         CLASS, INTERFACE, ENUM, ANNOTATION, PRIMITIVE, ARRAY
     }
     public Sort getSort();
+    public boolean canAssignTo(UnresolvedType type);
 }

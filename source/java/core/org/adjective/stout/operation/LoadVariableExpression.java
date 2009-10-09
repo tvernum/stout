@@ -92,4 +92,9 @@ public class LoadVariableExpression extends SmartExpression implements ElementBu
         return new AssignVariableOperation(_name, value);
     }
 
+    public String toString()
+    {
+        return getClass().getSimpleName() + "{" + _name + "}";
+    }
+
 }

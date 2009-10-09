@@ -20,6 +20,7 @@ package org.adjective.stout.impl;
 import org.objectweb.asm.Type;
 
 import org.adjective.stout.core.ParameterisedClass;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -110,4 +111,53 @@ public class ParameterisedClassImpl implements ParameterisedClass
         return Sort.CLASS;
     }
 
+    public String toString()
+    {
+        if (_parameters.length == 0)
+        {
+            return _class.getName();
+        }
+        else
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append(_class.getName());
+            builder.append("<");
+            for (TypeSpecification type : _parameters)
+            {
+                builder.append(type);
+                builder.append(',');
+            }
+            builder.setCharAt(builder.length() - 1, '>');
+            return builder.toString();
+        }
+    }
+
+    public boolean canAssignTo(UnresolvedType type)
+    {
+        return canAssign(_class, type);
+    }
+
+    private boolean canAssign(Class< ? > cls, UnresolvedType type)
+    {
+        if (cls == null)
+        {
+            return false;
+        }
+        if (Type.getDescriptor(cls).equals(type.getDescriptor()))
+        {
+            return true;
+        }
+        if (canAssign(cls.getSuperclass(), type))
+        {
+            return true;
+        }
+        for (Class< ? > ifc : cls.getInterfaces())
+        {
+            if (canAssign(ifc, type))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
