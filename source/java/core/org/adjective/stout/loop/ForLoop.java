@@ -48,7 +48,7 @@ public class ForLoop extends SmartStatement
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        stack.pushBlock();
+        Block block1 = stack.pushBlock();
         _initialiser.getInstructions(stack, collector);
 
         Label startLoop = new Label();
@@ -58,19 +58,20 @@ public class ForLoop extends SmartStatement
         _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
         
         Label nextLoop = new Label();
-        Block block = stack.pushBlock(nextLoop, endLoop);
+        Block block2 = stack.pushBlock(nextLoop, endLoop);
 
         for (Statement stmt : _body)
         {
             stmt.getInstructions(stack, collector);
         }
-        stack.popBlock(block);
+        stack.popBlock(block2);
 
         collector.add(new LabelInstruction(nextLoop));
         _increment.getInstructions(stack, collector);
         collector.add(new JumpInstruction(Opcodes.GOTO, startLoop));
         
         collector.add(new LabelInstruction(endLoop));
+        stack.popBlock(block1);
     }
 
 }

@@ -17,63 +17,54 @@
 
 package org.adjective.stout.loop;
 
+import java.util.Collection;
+
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.Statement;
+import org.adjective.stout.operation.StatementOperations;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class IterableLoopSpec implements ElementBuilder<IterableLoop>
 {
-    public ForLoopSpec forLoop()
+    private Statement[] _body;
+    private Expression _iterable;
+    private String _iteratorName;
+    private String _valueName;
+
+    public IterableLoop create()
     {
-        return new ForLoopSpec();
+        return new IterableLoop(_iterable, _iteratorName, _valueName, _body);
     }
 
-    public WhileLoopSpec whileLoop()
+    public IterableLoopSpec withIterable(Expression iterable)
     {
-        return new WhileLoopSpec();
+        _iterable = iterable;
+        return this;
     }
 
-    public ElementBuilder<Condition> always()
+    public IterableLoopSpec withIteratorName(Expression iterable)
     {
-        return AlwaysCondition.INSTANCE;
+        _iterable = iterable;
+        return this;
     }
 
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
+    public IterableLoopSpec withBody(Collection< ? extends ElementBuilder< ? extends Statement>> body)
     {
-        return expression(variable.create());
+        return withBody(StatementOperations.toStatementArray(body));
     }
 
-    public ElementBuilder<Condition> expression(Expression expression)
+    public IterableLoopSpec withBody(Statement[] body)
     {
-        return new ExpressionCondition(expression);
+        _body = body;
+        return this;
     }
 
-    public DoWhileLoopSpec doWhile()
+    public IterableLoopSpec withVariableName(String var)
     {
-        return new DoWhileLoopSpec();
+        _valueName = var;
+        return this;
     }
-
-    public IterableLoopSpec iterable()
-    {
-        return new IterableLoopSpec();
-    }
-
-    public IfElseSpec ifElse()
-    {
-        return new IfElseSpec();
-    }
-
-    public ElementBuilder< ? extends Statement> breakLoop()
-    {
-        return new BreakStatement();
-    }
-
-    public ElementBuilder< ? extends Statement> continueLoop()
-    {
-        return new ContinueStatement();
-    }
-
 }

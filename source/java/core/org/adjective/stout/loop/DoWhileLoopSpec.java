@@ -17,63 +17,44 @@
 
 package org.adjective.stout.loop;
 
+import java.util.Collection;
+
 import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.Statement;
+import org.adjective.stout.operation.StatementOperations;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class DoWhileLoopSpec implements ElementBuilder<DoWhileLoop>
 {
-    public ForLoopSpec forLoop()
+    private Statement[] _body;
+    private Condition _condition;
+
+    public DoWhileLoop create()
     {
-        return new ForLoopSpec();
+        return new DoWhileLoop(_condition, _body);
     }
 
-    public WhileLoopSpec whileLoop()
+    public DoWhileLoopSpec withCondition(ElementBuilder<Condition> condition)
     {
-        return new WhileLoopSpec();
+        return withCondition(condition.create());
     }
 
-    public ElementBuilder<Condition> always()
+    public DoWhileLoopSpec withCondition(Condition condition)
     {
-        return AlwaysCondition.INSTANCE;
+        _condition = condition;
+        return this;
     }
 
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
+    public DoWhileLoopSpec withBody(Collection< ? extends ElementBuilder< ? extends Statement>> body)
     {
-        return expression(variable.create());
+        return withBody(StatementOperations.toStatementArray(body));
     }
 
-    public ElementBuilder<Condition> expression(Expression expression)
+    public DoWhileLoopSpec withBody(Statement[] body)
     {
-        return new ExpressionCondition(expression);
+        _body = body;
+        return this;
     }
-
-    public DoWhileLoopSpec doWhile()
-    {
-        return new DoWhileLoopSpec();
-    }
-
-    public IterableLoopSpec iterable()
-    {
-        return new IterableLoopSpec();
-    }
-
-    public IfElseSpec ifElse()
-    {
-        return new IfElseSpec();
-    }
-
-    public ElementBuilder< ? extends Statement> breakLoop()
-    {
-        return new BreakStatement();
-    }
-
-    public ElementBuilder< ? extends Statement> continueLoop()
-    {
-        return new ContinueStatement();
-    }
-
 }

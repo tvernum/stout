@@ -32,7 +32,7 @@ import org.objectweb.asm.util.AbstractVisitor;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisitor
+class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisitor
 {
     private static final Type OBJECT_TYPE = Type.getType(Object.class);
 
@@ -55,7 +55,7 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
 
         public String toString()
         {
-            return this.type + " : " + this.description;
+            return (this.type == null ? ' ' : this.type) + " : " + this.description;
         }
     }
 
@@ -103,7 +103,7 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
         _output.println(OPCODES[opcode] + " " + string);
         for (StackValue value : _stack)
         {
-            _output.println(" [" + value + "]");
+            _output.println("\t\t== " + value);
         }
         _output.println();
     }
@@ -161,7 +161,7 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
             return new StackValue("*DNE*", OBJECT_TYPE);
         }
         StackValue value = _stack.remove(_stack.size() - 1);
-        _output.println(" : POP " + value);
+        _output.println("\t\t<< " + value);
         if (checkDoubleWidth && value.type == null)
         {
             error("Attempt to pop second half of double width value " + peek());
@@ -174,10 +174,10 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
         _output.println("*** ERROR *** " + message);
     }
 
-    private StackValue pop(Type type)
+    private StackValue pop(Type... types)
     {
-        StackValue value = pop(type.getSize());
-        checkType(value, type);
+        StackValue value = pop(types[0].getSize());
+        checkType(value, types);
         return value;
     }
 
@@ -532,26 +532,30 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
         return arr;
     }
 
-    private void checkType(StackValue value, Type required)
+    private void checkType(StackValue value, Type... types)
     {
-        checkType(value.type, value, required);
+        checkType(value.type, value, types);
     }
 
-    private void checkType(Type stackType, StackValue stackItem, Type required)
+    private void checkType(Type stackType, StackValue stackItem, Type... allowed)
     {
-        if (required.equals(stackType))
+        for (Type required : allowed)
         {
-            return;
+
+            if (required.equals(stackType))
+            {
+                return;
+            }
+            if (required.getSort() == Type.OBJECT && Object.class.getName().equals(required.getClassName()))
+            {
+                return;
+            }
+            if (required.getSort() == Type.OBJECT && Object.class.getName().equals(stackType.getClassName()))
+            {
+                return;
+            }
         }
-        if (required.getSort() == Type.OBJECT && Object.class.getName().equals(required.getClassName()))
-        {
-            return;
-        }
-        if (required.getSort() == Type.OBJECT && Object.class.getName().equals(stackType.getClassName()))
-        {
-            return;
-        }
-        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + required);
+        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + allowed);
     }
 
     private Type getType(int base, int opcode)
@@ -597,7 +601,9 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
         switch (opcode)
         {
             case Opcodes.IFEQ:
-                pop(Type.INT_TYPE);
+                pop(Type.INT_TYPE, Type.BOOLEAN_TYPE);
+                break;
+            case Opcodes.GOTO:
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
@@ -607,6 +613,7 @@ public class StackVisualiserMethodVisitor extends AbstractVisitor implements Met
 
     public void visitLabel(Label label)
     {
+        _output.println("-=[ " + label + " ]=-");
         // No-op
     }
 

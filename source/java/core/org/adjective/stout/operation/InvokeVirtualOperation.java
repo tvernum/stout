@@ -39,7 +39,7 @@ public class InvokeVirtualOperation implements Operation
     private final MethodSignature _method;
     private final Expression[] _arguments;
 
-    public InvokeVirtualOperation(Expression target, UnresolvedType targetType, MethodSignature method, Expression[] arguments)
+    public InvokeVirtualOperation(Expression target, UnresolvedType targetType, MethodSignature method, Expression... arguments)
     {
         if (method.getModifiers().contains(ElementModifier.STATIC))
         {

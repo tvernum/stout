@@ -17,41 +17,36 @@
 
 package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.MethodSignature;
 import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.exception.OperationException;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class InvokeVirtualExpression extends SmartExpression implements ElementBuilder<Expression>
+public class ChainExpression extends SmartExpression implements Expression
 {
-    private InvokeVirtualOperation _operation;
+    private final Expression _expression;
+    private final Statement[] _statements;
 
-    public InvokeVirtualExpression(MethodSignature method, Expression... expressions)
+    public ChainExpression(Expression expression, Statement... statements)
     {
-        this(null, null, method, expressions);
-    }
-
-    public InvokeVirtualExpression(Expression target, UnresolvedType targetType, MethodSignature method, Expression... arguments)
-    {
-        _operation = new InvokeVirtualOperation(target, targetType, method, arguments);
-        if (!_operation.hasReturnValue())
-        {
-            throw new OperationException("Cannot use a void method [" + method + "] as an expresison");
-        }
-    }
-
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
-    {
-        _operation.getInstructions(stack, collector);
+        _expression = expression;
+        _statements = statements;
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        return _operation.getReturnType();
+        return _expression.getExpressionType(stack);
     }
+
+    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    {
+        _expression.getInstructions(stack, collector);
+        for (Statement statement : _statements)
+        {
+            statement.getInstructions(stack, collector);
+        }
+    }
+
 }

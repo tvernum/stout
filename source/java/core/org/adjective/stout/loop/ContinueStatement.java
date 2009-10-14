@@ -23,44 +23,27 @@ import org.objectweb.asm.Opcodes;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.ExecutionStack.Block;
+import org.adjective.stout.exception.OperationException;
 import org.adjective.stout.instruction.JumpInstruction;
-import org.adjective.stout.instruction.LabelInstruction;
 import org.adjective.stout.operation.SmartStatement;
-import org.adjective.stout.operation.Statement;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class WhileLoop extends SmartStatement
+public class ContinueStatement extends SmartStatement
 {
-    private final Condition _condition;
-    private final Statement[] _body;
-
-    public WhileLoop(Condition condition, Statement[] body)
-    {
-        _condition = condition;
-        _body = body;
-    }
-
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        Block block1 = stack.pushBlock();
-
-        Label nextLoop = new Label();
-        collector.add(new LabelInstruction(nextLoop));
-        Label endLoop = new Label();
-        _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
-
-        Block block2 = stack.pushBlock(nextLoop, endLoop);
-        for (Statement stmt : _body)
+        for (Block block : stack.blocks())
         {
-            stmt.getInstructions(stack, collector);
+            Label label = block.continueLabel();
+            if (label != null)
+            {
+                collector.add(new JumpInstruction(Opcodes.GOTO, label));
+                return;
+            }
         }
-        stack.popBlock(block2);
-
-        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
-        collector.add(new LabelInstruction(endLoop));
-        stack.popBlock(block1);
+        throw new OperationException("No label to continue to");
     }
 
 }

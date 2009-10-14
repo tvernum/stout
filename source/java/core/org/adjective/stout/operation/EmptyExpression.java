@@ -20,38 +20,17 @@ package org.adjective.stout.operation;
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.MethodSignature;
-import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.exception.OperationException;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class InvokeVirtualExpression extends SmartExpression implements ElementBuilder<Expression>
+public class EmptyExpression extends SmartStatement implements ElementBuilder<Statement>
 {
-    private InvokeVirtualOperation _operation;
-
-    public InvokeVirtualExpression(MethodSignature method, Expression... expressions)
-    {
-        this(null, null, method, expressions);
-    }
-
-    public InvokeVirtualExpression(Expression target, UnresolvedType targetType, MethodSignature method, Expression... arguments)
-    {
-        _operation = new InvokeVirtualOperation(target, targetType, method, arguments);
-        if (!_operation.hasReturnValue())
-        {
-            throw new OperationException("Cannot use a void method [" + method + "] as an expresison");
-        }
-    }
+    public static final EmptyExpression INSTANCE = new EmptyExpression();
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        _operation.getInstructions(stack, collector);
+        // Do nothing
     }
 
-    public UnresolvedType getExpressionType(ExecutionStack stack)
-    {
-        return _operation.getReturnType();
-    }
 }

@@ -17,41 +17,27 @@
 
 package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
+import org.objectweb.asm.Opcodes;
+
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.MethodSignature;
 import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.exception.OperationException;
+import org.adjective.stout.instruction.GenericInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class InvokeVirtualExpression extends SmartExpression implements ElementBuilder<Expression>
+public class DuplicateStackExpression implements Expression
 {
-    private InvokeVirtualOperation _operation;
-
-    public InvokeVirtualExpression(MethodSignature method, Expression... expressions)
+    public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        this(null, null, method, expressions);
-    }
-
-    public InvokeVirtualExpression(Expression target, UnresolvedType targetType, MethodSignature method, Expression... arguments)
-    {
-        _operation = new InvokeVirtualOperation(target, targetType, method, arguments);
-        if (!_operation.hasReturnValue())
-        {
-            throw new OperationException("Cannot use a void method [" + method + "] as an expresison");
-        }
+        // Don't know the type...
+        return null;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        _operation.getInstructions(stack, collector);
+        collector.add(new GenericInstruction(Opcodes.DUP));
     }
 
-    public UnresolvedType getExpressionType(ExecutionStack stack)
-    {
-        return _operation.getReturnType();
-    }
 }

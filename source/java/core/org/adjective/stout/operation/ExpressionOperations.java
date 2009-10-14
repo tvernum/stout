@@ -144,4 +144,14 @@ public class ExpressionOperations
         return new CreateArrayExpression(new ParameterisedClassImpl(componentType), elements);
     }
 
+    public Expression chain(Expression expression, ElementBuilder<Statement>... statements)
+    {
+        return chain(expression, StatementOperations.toStatementArray(statements));
+    }
+
+    public Expression chain(Expression expression, Statement... statements)
+    {
+        return new ChainExpression(expression, statements);
+    }
+
 }

@@ -17,63 +17,56 @@
 
 package org.adjective.stout.loop;
 
+import java.util.Collection;
+
 import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.Statement;
+import org.adjective.stout.operation.StatementOperations;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class IfElseSpec implements ElementBuilder<IfElse>
 {
-    public ForLoopSpec forLoop()
+    private Condition _condition;
+    private Statement[] _true;
+    private Statement[] _false;
+
+    public IfElse create()
     {
-        return new ForLoopSpec();
+        return new IfElse(_condition, _true, _false);
     }
 
-    public WhileLoopSpec whileLoop()
+    public IfElseSpec withCondition(ElementBuilder<Condition> condition)
     {
-        return new WhileLoopSpec();
+        return withCondition(condition.create());
     }
 
-    public ElementBuilder<Condition> always()
+    public IfElseSpec withCondition(Condition condition)
     {
-        return AlwaysCondition.INSTANCE;
+        _condition = condition;
+        return this;
     }
 
-    public ElementBuilder<Condition> expression(ElementBuilder<Expression> variable)
+    public IfElseSpec whenTrue(Collection< ? extends ElementBuilder< ? extends Statement>> body)
     {
-        return expression(variable.create());
+        return whenTrue(StatementOperations.toStatementArray(body));
     }
 
-    public ElementBuilder<Condition> expression(Expression expression)
+    public IfElseSpec whenTrue(Statement[] body)
     {
-        return new ExpressionCondition(expression);
+        _true = body;
+        return this;
     }
 
-    public DoWhileLoopSpec doWhile()
+    public IfElseSpec whenFalse(Collection< ? extends ElementBuilder< ? extends Statement>> body)
     {
-        return new DoWhileLoopSpec();
+        return whenFalse(StatementOperations.toStatementArray(body));
     }
 
-    public IterableLoopSpec iterable()
+    public IfElseSpec whenFalse(Statement[] body)
     {
-        return new IterableLoopSpec();
+        _false = body;
+        return this;
     }
-
-    public IfElseSpec ifElse()
-    {
-        return new IfElseSpec();
-    }
-
-    public ElementBuilder< ? extends Statement> breakLoop()
-    {
-        return new BreakStatement();
-    }
-
-    public ElementBuilder< ? extends Statement> continueLoop()
-    {
-        return new ContinueStatement();
-    }
-
 }

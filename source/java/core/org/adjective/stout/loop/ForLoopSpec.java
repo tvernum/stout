@@ -17,9 +17,12 @@
 
 package org.adjective.stout.loop;
 
+import java.util.List;
+
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.operation.EmptyStatement;
 import org.adjective.stout.operation.Statement;
+import org.adjective.stout.operation.StatementOperations;
 
 import static org.adjective.stout.operation.StatementOperations.toStatementArray;
 
@@ -40,7 +43,7 @@ public class ForLoopSpec implements ElementBuilder<ForLoop>
         _increment = EmptyStatement.INSTANCE;
         _body = new Statement[0];
     }
-    
+
     public ForLoop create()
     {
         return new ForLoop(_initialiser, _condition, _increment, _body);
@@ -88,6 +91,11 @@ public class ForLoopSpec implements ElementBuilder<ForLoop>
     {
         _body = body;
         return this;
+    }
+
+    public ForLoopSpec withBody(List<ElementBuilder< ? extends Statement>> body)
+    {
+        return withBody(StatementOperations.toStatementArray(body));
     }
 
 }

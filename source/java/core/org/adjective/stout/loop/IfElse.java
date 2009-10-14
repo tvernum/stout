@@ -31,36 +31,47 @@ import org.adjective.stout.operation.Statement;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class WhileLoop extends SmartStatement
+public class IfElse extends SmartStatement
 {
     private final Condition _condition;
-    private final Statement[] _body;
+    private final Statement[] _whenTrue;
+    private final Statement[] _whenFalse;
 
-    public WhileLoop(Condition condition, Statement[] body)
+    public IfElse(Condition condition, Statement[] whenTrue, Statement[] whenFalse)
     {
         _condition = condition;
-        _body = body;
+        _whenTrue = whenTrue;
+        _whenFalse = whenFalse;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        Block block1 = stack.pushBlock();
+        Block block = stack.pushBlock();
 
-        Label nextLoop = new Label();
-        collector.add(new LabelInstruction(nextLoop));
-        Label endLoop = new Label();
-        _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
+        Label endLabel = new Label();
+        Label elseLabel = (_whenFalse == null ? endLabel : new Label());
 
-        Block block2 = stack.pushBlock(nextLoop, endLoop);
-        for (Statement stmt : _body)
+        _condition.jumpWhenFalse(elseLabel).getInstructions(stack, collector);
+
+        for (Statement stmt : _whenTrue)
         {
             stmt.getInstructions(stack, collector);
         }
-        stack.popBlock(block2);
 
-        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
-        collector.add(new LabelInstruction(endLoop));
-        stack.popBlock(block1);
+        if (_whenFalse != null)
+        {
+            collector.add(new JumpInstruction(Opcodes.GOTO, endLabel));
+            collector.add(new LabelInstruction(elseLabel));
+
+            for (Statement stmt : _whenFalse)
+            {
+                stmt.getInstructions(stack, collector);
+            }
+        }
+        
+        collector.add(new LabelInstruction(endLabel));
+
+        stack.popBlock(block);
     }
 
 }

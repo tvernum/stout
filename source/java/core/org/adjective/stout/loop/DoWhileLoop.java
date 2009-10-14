@@ -18,12 +18,10 @@
 package org.adjective.stout.loop;
 
 import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
 
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.ExecutionStack.Block;
-import org.adjective.stout.instruction.JumpInstruction;
 import org.adjective.stout.instruction.LabelInstruction;
 import org.adjective.stout.operation.SmartStatement;
 import org.adjective.stout.operation.Statement;
@@ -31,12 +29,12 @@ import org.adjective.stout.operation.Statement;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class WhileLoop extends SmartStatement
+public class DoWhileLoop extends SmartStatement
 {
     private final Condition _condition;
     private final Statement[] _body;
 
-    public WhileLoop(Condition condition, Statement[] body)
+    public DoWhileLoop(Condition condition, Statement[] body)
     {
         _condition = condition;
         _body = body;
@@ -46,11 +44,12 @@ public class WhileLoop extends SmartStatement
     {
         Block block1 = stack.pushBlock();
 
-        Label nextLoop = new Label();
-        collector.add(new LabelInstruction(nextLoop));
-        Label endLoop = new Label();
-        _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
+        Label startLoop = new Label();
 
+        collector.add(new LabelInstruction(startLoop));
+
+        Label nextLoop = new Label();
+        Label endLoop = new Label();
         Block block2 = stack.pushBlock(nextLoop, endLoop);
         for (Statement stmt : _body)
         {
@@ -58,8 +57,10 @@ public class WhileLoop extends SmartStatement
         }
         stack.popBlock(block2);
 
-        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
+        collector.add(new LabelInstruction(nextLoop));
+        _condition.jumpWhenTrue(startLoop).getInstructions(stack, collector);
         collector.add(new LabelInstruction(endLoop));
+
         stack.popBlock(block1);
     }
 

@@ -19,6 +19,7 @@ package org.adjective.stout.operation;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.adjective.stout.builder.ElementBuilder;
@@ -46,11 +47,11 @@ public class StatementOperations
         return statements;
     }
 
-    public static Statement[] toStatementArray(Collection<? extends ElementBuilder<? extends Statement>> builders)
+    public static Statement[] toStatementArray(Collection< ? extends ElementBuilder< ? extends Statement>> builders)
     {
         int i = 0;
         Statement[] statements = new Statement[builders.size()];
-        for (ElementBuilder<? extends Statement> builder : builders)
+        for (ElementBuilder< ? extends Statement> builder : builders)
         {
             statements[i] = builder.create();
             i++;
@@ -156,6 +157,11 @@ public class StatementOperations
     public ElementBuilder<Statement> superConstructor(MethodSignature method, Expression... arguments)
     {
         return new InvokeSuperConstructorStatement(method, arguments);
+    }
+
+    public ElementBuilder<Statement> block(List<ElementBuilder< ? extends Statement>> statements)
+    {
+        return new BlockStatement(toStatementArray(statements));
     }
 
 }
