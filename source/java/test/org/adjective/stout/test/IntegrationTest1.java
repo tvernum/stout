@@ -34,7 +34,7 @@ import org.adjective.stout.impl.ConstructorSignatureImpl;
 import org.adjective.stout.impl.MethodSignatureImpl;
 import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.load.StoutClassLoader;
-import org.adjective.stout.loop.LoopOperations;
+import org.adjective.stout.loop.ConditionalOperations;
 import org.adjective.stout.operation.ExpressionOperations;
 import org.adjective.stout.operation.StatementOperations;
 
@@ -49,7 +49,7 @@ public class IntegrationTest1
     {
         StatementOperations stmt = new StatementOperations();
         ExpressionOperations expr = new ExpressionOperations();
-        LoopOperations loop = new LoopOperations();
+        ConditionalOperations loop = new ConditionalOperations();
 
         // @TODO utility methods to get method signatures
         //        MethodSignature m_i = new MethodSignatureImpl(Collections.singleton(ElementModifier.PUBLIC), new ParameterisedClassImpl(Integer.TYPE), "m_i",

@@ -48,4 +48,9 @@ public class NullType implements UnresolvedType
         return Sort.CLASS;
     }
 
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        return null;
+    }
+
 }

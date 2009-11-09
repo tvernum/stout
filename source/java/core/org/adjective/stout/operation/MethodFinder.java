@@ -35,7 +35,7 @@ public class MethodFinder
         return new ConstructorSignatureImpl(type, parameters);
     }
 
-    public MethodSignature find(Class<?> declaring, String name, Class<?>... parameterTypes)
+    public MethodSignature find(Class< ? > declaring, String name, Class< ? >... parameterTypes)
     {
         try
         {
@@ -45,6 +45,17 @@ public class MethodFinder
         catch (RuntimeException e)
         {
             throw e;
+        }
+        catch (NoSuchMethodException e)
+        {
+            if (declaring == Object.class)
+            {
+                throw new OperationException("Cannot find method " + name + " in " + declaring, e);
+            }
+            else
+            {
+                return find(declaring.getSuperclass(), name, parameterTypes);
+            }
         }
         catch (Exception e)
         {

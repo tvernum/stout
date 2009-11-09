@@ -20,10 +20,12 @@ package org.adjective.stout.operation;
 import org.objectweb.asm.Opcodes;
 
 import org.adjective.stout.builder.ElementBuilder;
+import org.adjective.stout.builder.MethodSpec;
 import org.adjective.stout.core.ConstructorSignature;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.impl.ConstructorSignatureImpl;
 import org.adjective.stout.instruction.GenericInstruction;
 import org.adjective.stout.instruction.MethodInstruction;
 import org.adjective.stout.instruction.TypeInstruction;
@@ -42,6 +44,11 @@ public class ConstructorExpression extends SmartExpression implements ElementBui
         _expressions = expressions;
     }
 
+    public ConstructorExpression(UnresolvedType type, MethodSpec constructor, Expression... expressions)
+    {
+        this(new ConstructorSignatureImpl(type, constructor.getParameterTypes()), expressions);
+    }
+
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         collector.add(new TypeInstruction(Opcodes.NEW, _constructor.getType().getInternalName()));
@@ -58,7 +65,5 @@ public class ConstructorExpression extends SmartExpression implements ElementBui
     {
         return _constructor.getType();
     }
-    
-    
 
 }

@@ -160,4 +160,20 @@ public class ParameterisedClassImpl implements ParameterisedClass
         }
         return false;
     }
+
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        try
+        {
+            return new ParameterisedClassImpl(_class.getField(fieldName).getType());
+        }
+        catch (SecurityException e)
+        {
+            return null;
+        }
+        catch (NoSuchFieldException e)
+        {
+            return null;
+        }
+    }
 }

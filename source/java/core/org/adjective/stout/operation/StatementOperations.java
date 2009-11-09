@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.adjective.stout.builder.ElementBuilder;
+import org.adjective.stout.core.ConstructorSignature;
 import org.adjective.stout.core.ElementModifier;
 import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.MethodSignature;
@@ -77,6 +78,11 @@ public class StatementOperations
     public ElementBuilder<Statement> assignVariable(CharSequence name, Expression expression)
     {
         return new AssignVariableOperation(name.toString(), expression);
+    }
+
+    public ElementBuilder<Statement> assignField(CharSequence name, Expression expression)
+    {
+        return new AssignFieldOperation(null, null, name.toString(), null, expression);
     }
 
     public ElementBuilder<Statement> assignVariable(CharSequence name, ElementBuilder< ? extends Expression> expression)
@@ -147,16 +153,27 @@ public class StatementOperations
 
     public ElementBuilder<Statement> superConstructor(Class< ? >[] parameterTypes, Expression... arguments)
     {
+        ExtendedType[] parameters = ParameterisedClassImpl.getArray(parameterTypes);
+        return superConstructor(parameters, arguments);
+    }
+
+    public ElementBuilder<Statement> superConstructor(UnresolvedType[] parameters, Expression... arguments)
+    {
         Set<ElementModifier> access = Collections.singleton(ElementModifier.PROTECTED);
         ParameterisedClassImpl returnType = new ParameterisedClassImpl(Void.TYPE);
         String name = InvokeSuperConstructorStatement.CONSTRUCTOR_NAME;
-        MethodSignatureImpl signature = new MethodSignatureImpl(access, returnType, name, ParameterisedClassImpl.getArray(parameterTypes));
+        MethodSignatureImpl signature = new MethodSignatureImpl(access, returnType, name, parameters);
         return superConstructor(signature, arguments);
     }
 
     public ElementBuilder<Statement> superConstructor(MethodSignature method, Expression... arguments)
     {
         return new InvokeSuperConstructorStatement(method, arguments);
+    }
+
+    public ElementBuilder<Statement> superConstructor(ConstructorSignature signature, Expression... arguments)
+    {
+        return superConstructor(signature.getParameterTypes(), arguments);
     }
 
     public ElementBuilder<Statement> block(List<ElementBuilder< ? extends Statement>> statements)

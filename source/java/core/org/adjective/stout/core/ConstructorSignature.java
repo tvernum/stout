@@ -24,5 +24,5 @@ package org.adjective.stout.core;
 public interface ConstructorSignature
 {
     public UnresolvedType getType();
-    public ExtendedType[] getParameterTypes();
+    public UnresolvedType[] getParameterTypes();
 }

@@ -28,26 +28,29 @@ import org.objectweb.asm.Opcodes;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.Code;
 import org.adjective.stout.core.ElementModifier;
+import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.Operation;
 import org.adjective.stout.core.ParameterisedClass;
 import org.adjective.stout.core.TypeParameter;
+import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.impl.ClassImpl;
 import org.adjective.stout.impl.CodeImpl;
 import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.instruction.MethodInstruction;
-import org.adjective.stout.instruction.VarInstruction;
 import org.adjective.stout.operation.ReturnVoidOperation;
+import org.adjective.stout.operation.ThisExpression;
 
 import static org.adjective.stout.util.CollectionUtils.toArray;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class ClassSpec implements ElementBuilder<ClassDescriptor>
+public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedType
 {
-    private static final String CONSTRUCTOR_NAME = "<init>";
+    public static final String CONSTRUCTOR_NAME = "<init>";
+
     private final String _package;
     private final String _name;
     private final Set<ElementModifier> _modifiers;
@@ -85,7 +88,7 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>
     {
         String superName = _superClass.getInternalName();
 
-        Operation loadThis = new VarInstruction(Opcodes.ALOAD, 0);
+        Operation loadThis = ThisExpression.LOAD_THIS;
         Operation invokeSuper = new MethodInstruction(Opcodes.INVOKESPECIAL, superName, CONSTRUCTOR_NAME, "()V");
         Operation returnNothing = new ReturnVoidOperation();
         Code body = new CodeImpl(loadThis, invokeSuper, returnNothing);
@@ -224,5 +227,85 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>
     {
         _defaultConstructorAccess = access;
         return this;
+    }
+
+    public String getPackage()
+    {
+        return _package;
+    }
+
+    public String getName()
+    {
+        return _name;
+    }
+
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        if (_package != null)
+        {
+            builder.append(_package);
+            builder.append('.');
+        }
+        builder.append(_name);
+        if (_superClass != null)
+        {
+            builder.append(" extends ");
+            builder.append(_superClass);
+        }
+        return builder.toString();
+    }
+
+    public String getInternalName()
+    {
+        return _package.replace('.', '/') + "/" + _name;
+    }
+
+    public String getDescriptor()
+    {
+        return "L" + getInternalName() + ";";
+    }
+
+    public Sort getSort()
+    {
+        return Sort.CLASS;
+    }
+
+    public boolean canAssignTo(UnresolvedType type)
+    {
+        if (getDescriptor().equals(type.getDescriptor()))
+        {
+            return true;
+        }
+        if (_superClass != null && _superClass.canAssignTo(type))
+        {
+            return true;
+        }
+        if (_interfaces != null)
+        {
+            for (ExtendedType ifc : _interfaces)
+            {
+                if (ifc.canAssignTo(type))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        if (_fields != null)
+        {
+            for (FieldDescriptor field : _fields)
+            {
+                if (fieldName.equals(field.getName()))
+                {
+                    return field.getType();
+                }
+            }
+        }
+        return null;
     }
 }

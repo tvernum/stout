@@ -130,4 +130,16 @@ public class ClassImpl implements ClassDescriptor
         return false;
     }
 
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        for (FieldDescriptor field : _fields)
+        {
+            if (fieldName.equals(field.getName()))
+            {
+                return field.getType();
+            }
+        }
+        return null;
+    }
+
 }

@@ -18,6 +18,7 @@
 package org.adjective.stout.operation;
 
 import org.adjective.stout.builder.ElementBuilder;
+import org.adjective.stout.builder.MethodSpec;
 import org.adjective.stout.core.ConstructorSignature;
 import org.adjective.stout.core.MethodSignature;
 import org.adjective.stout.core.UnresolvedType;
@@ -103,6 +104,11 @@ public class ExpressionOperations
         return new ConstructorExpression(constructor, expressions);
     }
 
+    public Expression construct(UnresolvedType type, MethodSpec constructor, Expression... expressions)
+    {
+        return new ConstructorExpression(type, constructor, expressions);
+    }
+
     public Expression variable(String name)
     {
         return new LoadVariableExpression(name);
@@ -139,6 +145,21 @@ public class ExpressionOperations
         return new GetStaticFieldExpression(from, name, type);
     }
 
+    public Expression getField(Expression target, Class< ? > from, String name, Class< ? > type)
+    {
+        return getField(target, new ParameterisedClassImpl(from), name, new ParameterisedClassImpl(type));
+    }
+
+    public Expression getField(Expression target, UnresolvedType from, String name, UnresolvedType type)
+    {
+        return new GetFieldExpression(target, from, name, type);
+    }
+    
+    public Expression getField(String name, UnresolvedType type)
+    {
+        return new GetFieldExpression(name, type);
+    }
+
     public Expression array(Class< ? > componentType, Expression[] elements)
     {
         return new CreateArrayExpression(new ParameterisedClassImpl(componentType), elements);
@@ -153,5 +174,11 @@ public class ExpressionOperations
     {
         return new ChainExpression(expression, statements);
     }
+
+    public Expression thisObject()
+    {
+        return ThisExpression.INSTANCE;
+    }
+
 
 }

@@ -20,34 +20,42 @@ package org.adjective.stout.operation;
 import org.objectweb.asm.Opcodes;
 
 import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.ElementModifier;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.MethodSignature;
 import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.exception.OperationException;
-import org.adjective.stout.instruction.VarInstruction;
+import org.adjective.stout.instruction.FieldInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class ThisExpression extends SmartExpression
+public class GetFieldExpression extends SmartExpression implements Expression
 {
-    public static final ThisExpression INSTANCE = new ThisExpression();
-    public static final VarInstruction LOAD_THIS = new VarInstruction(Opcodes.ALOAD, 0);
+    private final Expression _target;
+    private final UnresolvedType _from;
+    private final String _name;
+    private final UnresolvedType _type;
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public GetFieldExpression(Expression target, UnresolvedType from, String name, UnresolvedType type)
     {
-        MethodSignature method = stack.currentMethod();
-        if (method.getModifiers().contains(ElementModifier.STATIC))
-        {
-            throw new OperationException("Cannot access 'this' inside a static method");
-        }
-        collector.add(LOAD_THIS);
+        _target = target;
+        _from = from;
+        _name = name;
+        _type = type;
+    }
+
+    public GetFieldExpression(String name, UnresolvedType type)
+    {
+        this(ThisExpression.INSTANCE, null, name, type);
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        return stack.currentClass();
+        return _type;
     }
 
+    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    {
+        _target.getInstructions(stack, collector);
+        String from = (_from == null ? stack.currentClass().getInternalName() : _from.getInternalName());
+        collector.add(new FieldInstruction(Opcodes.GETFIELD, from, _name, _type.getDescriptor()));
+    }
 }

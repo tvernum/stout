@@ -67,5 +67,10 @@ public class ParameterSpec implements ElementBuilder<Parameter>
         _annotations.add(annotation);
         return this;
     }
+    
+    public String toString()
+    {
+        return _type + " " + _name;
+    }
 
 }

@@ -71,4 +71,9 @@ public class ArrayType implements UnresolvedType
         return Type.getInternalName(Object.class).equals(type.getInternalName());
     }
 
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        return null;
+    }
+
 }

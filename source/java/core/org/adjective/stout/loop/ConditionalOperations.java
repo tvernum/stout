@@ -24,7 +24,7 @@ import org.adjective.stout.operation.Statement;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoopOperations
+public class ConditionalOperations
 {
     public ForLoopSpec forLoop()
     {
@@ -74,6 +74,11 @@ public class LoopOperations
     public ElementBuilder< ? extends Statement> continueLoop()
     {
         return new ContinueStatement();
+    }
+
+    public Expression conditional(Condition condition, Expression whenTrue, Expression whenFalse)
+    {
+        return new ConditionalExpression(condition, whenTrue, whenFalse);
     }
 
 }

@@ -18,7 +18,6 @@
 package org.adjective.stout.impl;
 
 import org.adjective.stout.core.ConstructorSignature;
-import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.UnresolvedType;
 
 /**
@@ -27,20 +26,20 @@ import org.adjective.stout.core.UnresolvedType;
 public class ConstructorSignatureImpl implements ConstructorSignature
 {
     private final UnresolvedType _type;
-    private final ExtendedType[] _parameterTypes;
+    private final UnresolvedType[] _parameterTypes;
 
     public ConstructorSignatureImpl(Class< ? > type, Class< ? >... parameterTypes)
     {
         this(new ParameterisedClassImpl(type), ParameterisedClassImpl.getArray(parameterTypes));
     }
 
-    public ConstructorSignatureImpl(UnresolvedType type, ExtendedType[] parameterTypes)
+    public ConstructorSignatureImpl(UnresolvedType type, UnresolvedType[] parameterTypes)
     {
         _type = type;
         _parameterTypes = parameterTypes;
     }
 
-    public ExtendedType[] getParameterTypes()
+    public UnresolvedType[] getParameterTypes()
     {
         return _parameterTypes;
     }

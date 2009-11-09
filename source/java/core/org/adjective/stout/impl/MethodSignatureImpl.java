@@ -21,9 +21,10 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.ElementModifier;
+import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.MethodSignature;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -32,10 +33,10 @@ public class MethodSignatureImpl implements MethodSignature
 {
     private final Set<ElementModifier> _modifiers;
     private final String _name;
-    private final ExtendedType[] _parameters;
+    private final UnresolvedType[] _parameters;
     private final ExtendedType _returnType;
 
-    public MethodSignatureImpl(Set<ElementModifier> modifiers, ExtendedType returnType, String name, ExtendedType[] parameters)
+    public MethodSignatureImpl(Set<ElementModifier> modifiers, ExtendedType returnType, String name, UnresolvedType[] parameters)
     {
         _modifiers = modifiers;
         _returnType = returnType;
@@ -69,7 +70,7 @@ public class MethodSignatureImpl implements MethodSignature
         return _name;
     }
 
-    public ExtendedType[] getParameterTypes()
+    public UnresolvedType[] getParameterTypes()
     {
         return _parameters;
     }

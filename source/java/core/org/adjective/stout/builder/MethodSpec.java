@@ -30,6 +30,7 @@ import org.adjective.stout.core.ElementModifier;
 import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.Parameter;
+import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.impl.CodeImpl;
 import org.adjective.stout.impl.MethodImpl;
 import org.adjective.stout.impl.ParameterisedClassImpl;
@@ -100,6 +101,16 @@ public class MethodSpec implements ElementBuilder<MethodDescriptor>
         return this;
     }
 
+    public UnresolvedType[] getParameterTypes()
+    {
+        UnresolvedType[] types = new UnresolvedType[_parameters.size()];
+        for (int i = 0; i < types.length; i++)
+        {
+            types[i] = _parameters.get(i).getType();
+        }
+        return types;
+    }
+
     public MethodSpec withAnnotation(ElementBuilder< ? extends AnnotationDescriptor> builder)
     {
         return withAnnotation(builder.create());
@@ -138,7 +149,7 @@ public class MethodSpec implements ElementBuilder<MethodDescriptor>
         return withBody(operations);
     }
 
-    public MethodSpec withBody(List<? extends ElementBuilder< ? extends Statement>> builders)
+    public MethodSpec withBody(List< ? extends ElementBuilder< ? extends Statement>> builders)
     {
         Statement[] operations = new Statement[builders.size()];
         for (int i = 0; i < operations.length; i++)

@@ -17,7 +17,7 @@
 
 package org.adjective.stout.operation;
 
-import org.adjective.stout.loop.LoopOperations;
+import org.adjective.stout.loop.ConditionalOperations;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -26,6 +26,6 @@ public class VM
 {
     public static final ExpressionOperations Expression = new ExpressionOperations();
     public static final StatementOperations Statement = new StatementOperations();
-    public static final LoopOperations Loop = new LoopOperations();
+    public static final ConditionalOperations Condition = new ConditionalOperations();
     public static final MethodFinder Method = new MethodFinder();
 }

@@ -19,6 +19,7 @@ package org.adjective.stout.tools;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -555,7 +556,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
                 return;
             }
         }
-        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + allowed);
+        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + Arrays.toString(allowed));
     }
 
     private Type getType(int base, int opcode)
@@ -659,14 +660,16 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc)
     {
-        String description = owner + "." + name + "(..)";
 
         Type[] argumentTypes = Type.getArgumentTypes(desc);
         Type returnType = Type.getReturnType(desc);
 
+        StringBuilder args = new StringBuilder();
+
         for (int i = argumentTypes.length; i > 0; i--)
         {
-            pop(argumentTypes[i - 1]);
+            args.append(pop(argumentTypes[i - 1]).description);
+            args.append(",");
         }
         switch (opcode)
         {
@@ -681,6 +684,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
         }
 
+        String description = owner + "." + name + "(" + args + ")";
         if (!returnType.equals(Type.VOID_TYPE))
         {
             push(description, returnType);
@@ -716,10 +720,19 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
             case Opcodes.NEW:
                 push(description, Type.getObjectType(type));
                 break;
+            case Opcodes.ANEWARRAY:
+                StackValue size = pop(Type.INT_TYPE);
+                push(description + "[" + size.description + "]", arrayOf(Type.getObjectType(type)));
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
         }
         print(opcode, description);
+    }
+
+    private Type arrayOf(Type element)
+    {
+        return Type.getType("[" + element.getDescriptor());
     }
 
     public void visitVarInsn(int opcode, int var)
