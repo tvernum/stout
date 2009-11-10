@@ -154,7 +154,7 @@ public class ExpressionOperations
     {
         return new GetFieldExpression(target, from, name, type);
     }
-    
+
     public Expression getField(String name, UnresolvedType type)
     {
         return new GetFieldExpression(name, type);
@@ -180,5 +180,9 @@ public class ExpressionOperations
         return ThisExpression.INSTANCE;
     }
 
+    public Expression classObject(UnresolvedType cls)
+    {
+        return new ConstantClassExpression(cls);
+    }
 
 }

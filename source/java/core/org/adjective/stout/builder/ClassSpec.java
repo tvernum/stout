@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
 
+import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.Code;
 import org.adjective.stout.core.ElementModifier;
@@ -53,10 +54,13 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     private final String _package;
     private final String _name;
+    private UnresolvedType _outerClass;
     private final Set<ElementModifier> _modifiers;
     private final List<TypeParameter> _parameters;
     private ParameterisedClass _superClass;
     private final List<ParameterisedClass> _interfaces;
+    private final List<AnnotationDescriptor> _annotations;
+    private final List<ClassDescriptor> _innerClasses;
     private final List<FieldDescriptor> _fields;
     private final List<MethodDescriptor> _methods;
     private ElementModifier _defaultConstructorAccess;
@@ -68,6 +72,8 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         _modifiers = new HashSet<ElementModifier>();
         _parameters = new ArrayList<TypeParameter>();
         _interfaces = new ArrayList<ParameterisedClass>();
+        _annotations = new ArrayList<AnnotationDescriptor>();
+        _innerClasses = new ArrayList<ClassDescriptor>();
         _fields = new ArrayList<FieldDescriptor>();
         _methods = new ArrayList<MethodDescriptor>();
         _defaultConstructorAccess = null;
@@ -79,8 +85,9 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         {
             addDefaultConstructor();
         }
-        return new ClassImpl(_modifiers, _package, _name, toArray(_parameters, TypeParameter.class), // 
+        return new ClassImpl(_modifiers, _package, _name, _outerClass, toArray(_parameters, TypeParameter.class), // 
                 _superClass, toArray(_interfaces, ParameterisedClass.class), //
+                toArray(_annotations, AnnotationDescriptor.class), toArray(_innerClasses, ClassDescriptor.class), //
                 toArray(_fields, FieldDescriptor.class), toArray(_methods, MethodDescriptor.class));
     }
 
@@ -182,6 +189,17 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         {
             this.withInterface(builder);
         }
+        return this;
+    }
+
+    public ClassSpec withAnnotation(ElementBuilder< ? extends AnnotationDescriptor> builder)
+    {
+        return withAnnotation(builder.create());
+    }
+
+    public ClassSpec withAnnotation(AnnotationDescriptor annotation)
+    {
+        _annotations.add(annotation);
         return this;
     }
 
@@ -308,4 +326,23 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         }
         return null;
     }
+
+    public ClassSpec withOuterClass(UnresolvedType outer)
+    {
+        _outerClass = outer;
+        return this;
+    }
+
+    public ClassSpec withInnerClasses(ClassDescriptor... inner)
+    {
+        _innerClasses.addAll(Arrays.asList(inner));
+        return this;
+    }
+
+    public ClassSpec withInnerClass(ClassDescriptor inner)
+    {
+        _innerClasses.add(inner);
+        return this;
+    }
+
 }

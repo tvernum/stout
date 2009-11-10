@@ -19,6 +19,7 @@ package org.adjective.stout.impl;
 
 import java.util.Set;
 
+import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.ElementModifier;
 import org.adjective.stout.core.ExtendedType;
@@ -36,21 +37,27 @@ public class ClassImpl implements ClassDescriptor
     private final Set<ElementModifier> _modifiers;
     private final String _package;
     private final String _name;
+    private final UnresolvedType _outerClass;
     private final TypeParameter[] _parameters;
     private final ParameterisedClass _superClass;
     private final ParameterisedClass[] _interfaces;
+    private final AnnotationDescriptor[] _annotations;
+    private final ClassDescriptor[] _innerClasses;
     private final FieldDescriptor[] _fields;
     private final MethodDescriptor[] _methods;
 
-    public ClassImpl(Set<ElementModifier> modifiers, String pkg, String name, TypeParameter[] parameters, ParameterisedClass superClass,
-            ParameterisedClass[] interfaces, FieldDescriptor[] fields, MethodDescriptor[] methods)
+    public ClassImpl(Set<ElementModifier> modifiers, String pkg, String name, UnresolvedType outerClass, TypeParameter[] parameters, ParameterisedClass superClass,
+            ParameterisedClass[] interfaces, AnnotationDescriptor[] annotations, ClassDescriptor[] innerClasses, FieldDescriptor[] fields, MethodDescriptor[] methods)
     {
         _modifiers = modifiers;
         _package = pkg;
         _name = name;
+        _outerClass = outerClass;
         _parameters = parameters;
         _superClass = superClass;
         _interfaces = interfaces;
+        _annotations = annotations;
+        _innerClasses = innerClasses;
         _fields = fields;
         _methods = methods;
     }
@@ -142,4 +149,18 @@ public class ClassImpl implements ClassDescriptor
         return null;
     }
 
+    public AnnotationDescriptor[] getAnnotations()
+    {
+        return _annotations;
+    }
+
+    public ClassDescriptor[] getInnerClasses()
+    {
+        return _innerClasses;
+    }
+    
+    public UnresolvedType getOuterClass()
+    {
+        return _outerClass;
+    }
 }

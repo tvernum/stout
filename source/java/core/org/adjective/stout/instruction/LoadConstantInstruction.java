@@ -25,11 +25,11 @@ import org.adjective.stout.core.Instruction;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class LoadConstantExpression extends AbstractInstruction implements Instruction
+public class LoadConstantInstruction extends AbstractInstruction implements Instruction
 {
     private final Object _value;
 
-    public LoadConstantExpression(Object value)
+    public LoadConstantInstruction(Object value)
     {
         super(Opcodes.LDC);
         _value = value;

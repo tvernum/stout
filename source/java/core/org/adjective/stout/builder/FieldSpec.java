@@ -49,7 +49,7 @@ public class FieldSpec implements ElementBuilder<FieldDescriptor>
 
     public FieldDescriptor create()
     {
-        return new FieldImpl(_modifiers, _type, _name, new AnnotationDescriptor[0]);
+        return new FieldImpl(_modifiers, _type, _name, _annotations.toArray(new AnnotationDescriptor[_annotations.size()]));
     }
 
     public FieldSpec withType(UnresolvedType type)
@@ -58,11 +58,11 @@ public class FieldSpec implements ElementBuilder<FieldDescriptor>
         return this;
     }
 
-    public FieldSpec withType(Class<?> type)
+    public FieldSpec withType(Class< ? > type)
     {
         return withType(new ParameterisedClassImpl(type));
     }
-    
+
     public FieldSpec withAnnotation(ElementBuilder< ? extends AnnotationDescriptor> builder)
     {
         return withAnnotation(builder.create());

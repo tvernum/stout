@@ -17,9 +17,11 @@
 
 package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
+import org.objectweb.asm.Type;
+
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.ParameterisedClass;
 import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.instruction.LoadConstantInstruction;
@@ -27,27 +29,25 @@ import org.adjective.stout.instruction.LoadConstantInstruction;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class ConstantValueExpression<T> extends SmartExpression implements ElementBuilder<Expression>
+public class ConstantClassExpression extends SmartExpression implements Expression
 {
-    private final T _value;
+    private static final ParameterisedClass CLASS_TYPE = new ParameterisedClassImpl(Class.class);
 
-    public ConstantValueExpression(T value)
-    {
-        if (value == null)
-        {
-            throw new NullPointerException("Cannot have a null constant. Use " + NullExpression.class.getSimpleName() + " instead");
-        }
-        _value = value;
-    }
+    private final UnresolvedType _class;
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public ConstantClassExpression(UnresolvedType cls)
     {
-        collector.add(new LoadConstantInstruction(_value));
+        _class = cls;
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        return new ParameterisedClassImpl(_value.getClass());
+        return CLASS_TYPE;
+    }
+
+    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    {
+        new LoadConstantInstruction(Type.getType(_class.getDescriptor())).getInstructions(stack, collector);
     }
 
 }

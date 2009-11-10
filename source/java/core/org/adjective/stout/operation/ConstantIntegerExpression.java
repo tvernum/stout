@@ -27,7 +27,7 @@ import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.instruction.GenericInstruction;
 import org.adjective.stout.instruction.IntInstruction;
-import org.adjective.stout.instruction.LoadConstantExpression;
+import org.adjective.stout.instruction.LoadConstantInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -64,7 +64,7 @@ public class ConstantIntegerExpression extends SmartExpression implements Elemen
         {
             return new IntInstruction(Opcodes.SIPUSH, value);
         }
-        return new LoadConstantExpression(new Integer(value));
+        return new LoadConstantInstruction(new Integer(value));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

@@ -28,9 +28,12 @@ public interface ClassDescriptor extends UnresolvedType
     public String getPackage();
     public String getName();
     public String getInternalName();
+    public UnresolvedType getOuterClass();
     public TypeParameter[] getParameters();
     public ParameterisedClass getSuperClass();
     public ParameterisedClass[] getInterfaces();
+    public AnnotationDescriptor[] getAnnotations();
+    public ClassDescriptor[] getInnerClasses();
     public FieldDescriptor[] getFields();
     public MethodDescriptor[] getMethods();
 }

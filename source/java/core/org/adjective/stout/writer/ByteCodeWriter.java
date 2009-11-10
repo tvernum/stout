@@ -58,10 +58,28 @@ public class ByteCodeWriter
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         ClassVisitor cv = new TraceClassVisitor(writer, new PrintWriter(System.err));
         cv = new CheckClassAdapter(cv);
-        
+
         String signature = null; // @TODO
         cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers()), cls.getInternalName(), signature, getInternalName(cls.getSuperClass()),
                 getInterfaceNames(cls));
+
+        UnresolvedType outer = cls.getOuterClass();
+        if (outer != null)
+        {
+            cv.visitOuterClass(outer.getInternalName(), null, null);
+        }
+
+        for (AnnotationDescriptor annotation : cls.getAnnotations())
+        {
+            writeAnnotation(cv, annotation);
+        }
+
+        for (ClassDescriptor inner : cls.getInnerClasses())
+        {
+            String name = inner.getInternalName();
+            String simpleName = name.substring(name.lastIndexOf('/') + 1);
+            cv.visitInnerClass(name, cls.getInternalName(), simpleName, getModifierCode(inner.getModifiers()));
+        }
 
         for (FieldDescriptor field : cls.getFields())
         {
@@ -75,6 +93,12 @@ public class ByteCodeWriter
 
         cv.visitEnd();
         return writer.toByteArray();
+    }
+
+    private void writeAnnotation(ClassVisitor cv, AnnotationDescriptor annotation)
+    {
+        AnnotationVisitor av = cv.visitAnnotation(Type.getDescriptor(annotation.getType()), annotation.isRuntime());
+        this.processAnnotation(annotation, av);
     }
 
     private void writeField(ClassVisitor cv, FieldDescriptor field)
