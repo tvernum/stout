@@ -215,6 +215,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
             case Opcodes.GETFIELD:
                 pop();
                 push(description, desc);
+                break;
             case Opcodes.PUTFIELD:
                 pop(2);
                 break;

@@ -15,34 +15,38 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.instruction;
+package org.adjective.stout.operation;
 
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-import org.adjective.stout.core.Instruction;
+import org.adjective.stout.core.ExecutionStack;
+import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.instruction.TypeInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class TypeInstruction extends AbstractInstruction implements Instruction
+public class CastExpression extends SmartExpression implements Expression
 {
-    private final String _type;
+    private final UnresolvedType _type;
+    private final Expression _expression;
 
-    public TypeInstruction(int opCode, String type)
+    public CastExpression(UnresolvedType type, Expression expression)
     {
-        super(opCode);
         _type = type;
+        _expression = expression;
     }
 
-    public TypeInstruction(int opCode, UnresolvedType type)
+    public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        this(opCode, type.getInternalName());
+        return _type;
     }
 
-    public void accept(MethodVisitor visitor)
+    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        visitor.visitTypeInsn(getOpCode(), _type);
+        _expression.getInstructions(stack, collector);
+        collector.add(new TypeInstruction(Opcodes.CHECKCAST, _type));
     }
 
 }

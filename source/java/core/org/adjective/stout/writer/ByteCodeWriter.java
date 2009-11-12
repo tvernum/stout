@@ -17,6 +17,7 @@
 
 package org.adjective.stout.writer;
 
+import java.io.PrintWriter;
 import java.util.Set;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -27,6 +28,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
@@ -51,12 +53,32 @@ import org.adjective.stout.operation.Variable;
  */
 public class ByteCodeWriter
 {
+    private boolean _trace = false;
+    private boolean _check = true;
+
+    public void setTrace(boolean trace)
+    {
+        _trace = trace;
+    }
+
+    public void setCheck(boolean check)
+    {
+        _check = check;
+    }
+
     public byte[] write(ClassDescriptor cls)
     {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        //        ClassVisitor cv = new TraceClassVisitor(writer, new PrintWriter(System.err));
-        ClassVisitor cv = new CheckClassAdapter(writer);
-
+        ClassVisitor cv = writer;
+        if (_trace)
+        {
+            cv = new TraceClassVisitor(cv, new PrintWriter(System.err));
+        }
+        if (_check)
+        {
+            cv = new CheckClassAdapter(cv);
+        }
+        
         String signature = null; // @TODO
         cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers()), cls.getInternalName(), signature, getInternalName(cls.getSuperClass()),
                 getInterfaceNames(cls));

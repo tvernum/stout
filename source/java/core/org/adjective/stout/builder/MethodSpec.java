@@ -19,6 +19,7 @@ package org.adjective.stout.builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +66,12 @@ public class MethodSpec implements ElementBuilder<MethodDescriptor>
 
     public MethodSpec withModifiers(ElementModifier... modifiers)
     {
-        _modifiers.addAll(Arrays.asList(modifiers));
+        return withModifiers(Arrays.asList(modifiers));
+    }
+
+    public MethodSpec withModifiers(Collection<ElementModifier> modifiers)
+    {
+        _modifiers.addAll(modifiers);
         return this;
     }
 

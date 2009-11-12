@@ -185,4 +185,9 @@ public class ExpressionOperations
         return new ConstantClassExpression(cls);
     }
 
+    public Expression cast(UnresolvedType type, Expression expression)
+    {
+        return new CastExpression(type, expression);
+    }
+
 }
