@@ -94,6 +94,11 @@ public class ClassVerifier
             System.err.println(" : ERROR");
             e.printStackTrace();
         }
+        catch (VerifyError e)
+        {
+            System.err.println(" : ERROR");
+            e.printStackTrace();
+        }
     }
 
 }

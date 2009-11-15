@@ -24,6 +24,7 @@ import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
@@ -31,9 +32,10 @@ import org.objectweb.asm.Type;
  */
 class StackVisualiserClassVisitor implements ClassVisitor
 {
-
     private final String _method;
     private final PrintStream _output;
+    private String _name;
+    private String _superName;
 
     public StackVisualiserClassVisitor(String method, PrintStream output)
     {
@@ -41,9 +43,10 @@ class StackVisualiserClassVisitor implements ClassVisitor
         _output = output;
     }
 
-
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
     {
+        _name = name;
+        _superName = superName;
         _output.print("Class: " + name + " ; Extends: " + superName);
         if (interfaces.length > 0)
         {
@@ -94,7 +97,9 @@ class StackVisualiserClassVisitor implements ClassVisitor
                 _output.print(" ");
             }
             _output.println(")");
-            return new StackVisualiserMethodVisitor(_output);
+            Type thisType = Type.getType("L" + _name + ";");
+            Type superType = Type.getType("L" + _superName + ";");
+            return new StackVisualiserMethodVisitor(_output, thisType, superType, (access & Opcodes.ACC_STATIC) > 0, arguments);
         }
         return null;
     }

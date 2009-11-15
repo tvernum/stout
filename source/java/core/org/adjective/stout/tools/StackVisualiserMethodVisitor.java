@@ -62,10 +62,18 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
 
     private final PrintStream _output;
     private final List<StackValue> _stack;
+    private final Type _this;
+    private final Type _superType;
+    private final boolean _isStatic;
+    private final Type[] _arguments;
 
-    public StackVisualiserMethodVisitor(PrintStream output)
+    public StackVisualiserMethodVisitor(PrintStream output, Type thisType, Type superType, boolean isStatic, Type[] arguments)
     {
         _output = output;
+        _this = thisType;
+        _superType = superType;
+        _isStatic = isStatic;
+        _arguments = arguments;
         _stack = new ArrayList<StackValue>();
     }
 
@@ -467,8 +475,10 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
             case Opcodes.ATHROW:
                 popObject();
                 break;
+            case Opcodes.RETURN:
+                break;
             default:
-                throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
+                throw new IllegalArgumentException("Unsupported opcode " + opcode + " - " + OPCODES[opcode]);
         }
         print(opcode, "");
         /* 
@@ -543,21 +553,74 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
     {
         for (Type required : allowed)
         {
-
             if (required.equals(stackType))
             {
                 return;
             }
-            if (required.getSort() == Type.OBJECT && Object.class.getName().equals(required.getClassName()))
+            if ("Z".equals(required.getDescriptor()))
             {
-                return;
+                if ("I".equals(stackType.getDescriptor()))
+                {
+                    return;
+                }
             }
-            if (required.getSort() == Type.OBJECT && Object.class.getName().equals(stackType.getClassName()))
+            if (required.getSort() == Type.OBJECT)
             {
-                return;
+                if (Object.class.getName().equals(required.getClassName()))
+                {
+                    return;
+                }
+                if (Object.class.getName().equals(stackType.getClassName()))
+                {
+                    return;
+                }
+                Type type = stackType;
+                if (type.equals(_this))
+                {
+                    type = _superType;
+                }
+                try
+                {
+                    Class< ? > stackClass = Class.forName(type.getClassName());
+                    if (checkClass(stackClass, required))
+                    {
+                        return;
+                    }
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // :(
+                    error("Cannot load class : " + e);
+                    continue;
+                }
             }
         }
         error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + Arrays.toString(allowed));
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean checkClass(Class< ? > cls, Type required)
+    {
+        if (cls == null)
+        {
+            return false;
+        }
+        if (cls.getName().equals(required.getClassName()))
+        {
+            return true;
+        }
+        if (checkClass(cls.getSuperclass(), required))
+        {
+            return true;
+        }
+        for (Class iface : cls.getInterfaces())
+        {
+            if (checkClass(iface, required))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Type getType(int base, int opcode)
@@ -669,8 +732,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
 
         for (int i = argumentTypes.length; i > 0; i--)
         {
-            args.append(pop(argumentTypes[i - 1]).description);
-            args.append(",");
+            args.insert(0, pop(argumentTypes[i - 1]).description + ",");
         }
         switch (opcode)
         {
@@ -685,12 +747,18 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
         }
 
-        String description = owner + "." + name + "(" + args + ")";
+        String description = simpleName(owner) + "." + name + "(" + args + ")";
         if (!returnType.equals(Type.VOID_TYPE))
         {
             push(description, returnType);
         }
         print(opcode, description + " {" + desc + "}");
+    }
+
+    private String simpleName(String owner)
+    {
+        int idx = owner.lastIndexOf('/');
+        return owner.substring(idx + 1);
     }
 
     public void visitMultiANewArrayInsn(String desc, int dims)
@@ -719,11 +787,11 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
         switch (opcode)
         {
             case Opcodes.NEW:
-                push(description, Type.getObjectType(type));
+                push(simpleName(type), Type.getObjectType(type));
                 break;
             case Opcodes.ANEWARRAY:
                 StackValue size = pop(Type.INT_TYPE);
-                push(description + "[" + size.description + "]", arrayOf(Type.getObjectType(type)));
+                push(simpleName(type) + "[" + size.description + "]", arrayOf(Type.getObjectType(type)));
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
@@ -758,6 +826,18 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
             case Opcodes.ALOAD:
                 {
                     Type type = getType(Opcodes.ILOAD, opcode);
+                    if (_isStatic)
+                    {
+                        var++;
+                    }
+                    if (var == 0)
+                    {
+                        type = _this;
+                    }
+                    else if (var <= _arguments.length)
+                    {
+                        type = _arguments[var - 1];
+                    }
                     push(description, type);
                 }
                 break;
