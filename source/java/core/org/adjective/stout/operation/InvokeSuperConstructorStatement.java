@@ -23,6 +23,8 @@ import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.MethodSignature;
+import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.exception.OperationException;
 import org.adjective.stout.instruction.MethodInstruction;
 import org.adjective.stout.instruction.VarInstruction;
 
@@ -46,6 +48,10 @@ public class InvokeSuperConstructorStatement extends SmartStatement implements E
         {
             throw new IllegalArgumentException("Constructors must be named '" + CONSTRUCTOR_NAME + "'");
         }
+        if (arguments.length != method.getParameterTypes().length)
+        {
+            throw new IllegalArgumentException("Incorrect number of arguments to constructor " + method);
+        }
         _method = method;
         _arguments = arguments;
     }
@@ -53,8 +59,24 @@ public class InvokeSuperConstructorStatement extends SmartStatement implements E
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         collector.add(new VarInstruction(Opcodes.ALOAD, 0));
-        for (Expression expr : _arguments)
+        for (int i = 0; i < _arguments.length; i++)
         {
+            Expression expr = _arguments[i];
+            UnresolvedType expressionType = expr.getExpressionType(stack);
+            UnresolvedType parameterType = _method.getParameterTypes()[i];
+            if (!expressionType.canAssignTo(parameterType))
+            {
+                throw new OperationException("Cannot assign expression "
+                        + expr
+                        + " ("
+                        + expressionType
+                        + ") to parameter "
+                        + i
+                        + "("
+                        + parameterType
+                        + ") of "
+                        + _method);
+            }
             expr.getInstructions(stack, collector);
         }
         String superName = stack.currentClass().getSuperClass().getInternalName();
