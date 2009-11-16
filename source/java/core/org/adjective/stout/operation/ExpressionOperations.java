@@ -86,6 +86,7 @@ public class ExpressionOperations
 
     public Expression constant(long l)
     {
+        // @TODO - use lconst opcode
         return new ConstantValueExpression<Long>(l);
     }
 
