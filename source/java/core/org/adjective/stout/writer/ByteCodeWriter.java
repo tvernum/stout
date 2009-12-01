@@ -33,7 +33,6 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.ElementModifier;
-import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.Instruction;
@@ -167,7 +166,7 @@ public class ByteCodeWriter
 
         mv.visitCode();
 
-        ExecutionStack stack = new CodeStack(cls, method, mv);
+        CodeStack stack = new CodeStack(cls, method, mv);
         Block block = stack.pushBlock();
         if (!isStatic(method))
         {
@@ -187,6 +186,8 @@ public class ByteCodeWriter
             }
         };
         method.getBody().getInstructions(stack, collector);
+        stack.popBlock(block);
+        stack.declareVariableInfo();
 
         mv.visitMaxs(0, 0);
         mv.visitEnd();
