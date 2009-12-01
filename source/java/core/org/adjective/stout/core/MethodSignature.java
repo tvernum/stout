@@ -19,14 +19,16 @@ package org.adjective.stout.core;
 
 import java.util.Set;
 
-
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
 public interface MethodSignature
 {
-    public String           getName();
-    public ExtendedType   getReturnType();
+    public String getName();
+
+    public ExtendedType getReturnType();
+
     public UnresolvedType[] getParameterTypes();
-    public Set<ElementModifier>  getModifiers();
+
+    public Set<ElementModifier> getModifiers();
 }

@@ -22,5 +22,5 @@ package org.adjective.stout.core;
  */
 public interface ExtendedType extends UnresolvedType
 {
-    public Class<?> getRawClass();
+    public Class< ? > getRawClass();
 }

@@ -23,13 +23,16 @@ package org.adjective.stout.core;
 public interface UnresolvedType
 {
     public String getInternalName();
+
     public String getDescriptor();
-    
+
     public enum Sort
     {
         CLASS, INTERFACE, ENUM, ANNOTATION, PRIMITIVE, ARRAY
     }
+
     public Sort getSort();
+
     public boolean canAssignTo(UnresolvedType type);
 
     public UnresolvedType getFieldType(String fieldName);

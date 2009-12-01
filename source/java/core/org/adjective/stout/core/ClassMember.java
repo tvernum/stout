@@ -26,6 +26,8 @@ import java.util.Set;
 public interface ClassMember
 {
     public Set<ElementModifier> getModifiers();
+
     public String getName();
-    public AnnotationDescriptor[]  getAnnotations();
+
+    public AnnotationDescriptor[] getAnnotations();
 }

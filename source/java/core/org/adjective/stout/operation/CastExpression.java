@@ -48,30 +48,4 @@ public class CastExpression extends SmartExpression implements Expression
         _expression.getInstructions(stack, collector);
         collector.add(new TypeInstruction(Opcodes.CHECKCAST, _type));
     }
-
-//    public Operation[] getChildren()
-//    {
-//        return new Operation[] { _expression };
-//    }
-//
-//    public boolean hasDescendant(Operation child)
-//    {
-//        return _expression.hasDescendant(child) || _expression == child;
-//    }
-//
-//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (this != checkPoint)
-//        {
-//            _expression.restoreStack(stack, collector, checkPoint);
-//        }
-//    }
-//
-//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (this != checkPoint)
-//        {
-//            _expression.saveStack(stack, collector, checkPoint);
-//        }
-//    }
 }

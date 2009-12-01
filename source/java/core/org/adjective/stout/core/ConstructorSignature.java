@@ -17,12 +17,12 @@
 
 package org.adjective.stout.core;
 
-
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
 public interface ConstructorSignature
 {
     public UnresolvedType getType();
+
     public UnresolvedType[] getParameterTypes();
 }

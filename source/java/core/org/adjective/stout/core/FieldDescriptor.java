@@ -25,7 +25,10 @@ import java.util.Set;
 public interface FieldDescriptor extends ClassMember
 {
     public Set<ElementModifier> getModifiers();
+
     public UnresolvedType getType();
+
     public String getName();
-    public AnnotationDescriptor[]  getAnnotations();
+
+    public AnnotationDescriptor[] getAnnotations();
 }

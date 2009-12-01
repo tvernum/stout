@@ -23,6 +23,8 @@ package org.adjective.stout.core;
 public interface InstructionCollector
 {
     public void add(Instruction instruction);
+
     public void add(Iterable<Instruction> instructions);
+
     public void add(Instruction... instructions);
 }

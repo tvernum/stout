@@ -24,11 +24,17 @@ public interface ParameterisedClass extends ExtendedType
 {
     public interface TypeSpecification
     {
-        public enum Bound { DIRECT, SUPER, EXTENDS }
+        public enum Bound
+        {
+            DIRECT, SUPER, EXTENDS
+        }
+
         public Bound getBound();
+
         public ExtendedType getType();
     }
 
-    public Class<?> getRawClass();
+    public Class< ? > getRawClass();
+
     public TypeSpecification[] getTypeParameters();
 }

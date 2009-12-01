@@ -19,16 +19,19 @@ package org.adjective.stout.core;
 
 import java.util.Set;
 
-
-
 public interface MethodDescriptor extends ClassMember, MethodSignature
 {
-    public String                  getName();
-    public ExtendedType            getReturnType();
-    public Set<ElementModifier>    getModifiers();
-    public Parameter[]             getParameters();
-    public AnnotationDescriptor[]  getAnnotations();
-    public Code                    getBody();
-    public ExtendedType[]          getExceptions();
-}
+    public String getName();
 
+    public ExtendedType getReturnType();
+
+    public Set<ElementModifier> getModifiers();
+
+    public Parameter[] getParameters();
+
+    public AnnotationDescriptor[] getAnnotations();
+
+    public Code getBody();
+
+    public ExtendedType[] getExceptions();
+}

@@ -74,33 +74,4 @@ public class AssignFieldStatement extends SmartStatement implements ElementBuild
         _expression.getInstructions(stack, collector);
         collector.add(new FieldInstruction(Opcodes.PUTFIELD, owner.getInternalName(), _fieldName, type.getDescriptor()));
     }
-
-//    public Operation[] getChildren()
-//    {
-//        return new Operation[] { (_target == null) ? ThisExpression.INSTANCE : _target, _expression };
-//    }
-//
-//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (hasDescendant(checkPoint))
-//        {
-//            _target.restoreStack(stack, collector, checkPoint);
-//            _expression.restoreStack(stack, collector, checkPoint);
-//        }
-//    }
-//
-//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (hasDescendant(checkPoint))
-//        {
-//            _target.saveStack(stack, collector, checkPoint);
-//            _expression.saveStack(stack, collector, checkPoint);
-//        }
-//    }
-//
-//    public boolean hasDescendant(Operation child)
-//    {
-//        return _target.hasDescendant(child) || _expression.hasDescendant(child) || _target == child || _expression == child;
-//    }
-
 }

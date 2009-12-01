@@ -24,13 +24,14 @@ import org.objectweb.asm.MethodVisitor;
  */
 public interface Instruction extends Operation
 {
-//    public interface StackChange
-//    {
-//        public OperandType[] pop();
-//        public OperandType[] push();
-//    }
-    
+    //    public interface StackChange
+    //    {
+    //        public OperandType[] pop();
+    //        public OperandType[] push();
+    //    }
+
     public int getOpCode();
+
     public void accept(MethodVisitor visitor);
-//    public StackChange getStackChange();
+    //    public StackChange getStackChange();
 }

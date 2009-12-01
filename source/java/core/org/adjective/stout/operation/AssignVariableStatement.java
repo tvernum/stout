@@ -57,31 +57,4 @@ public class AssignVariableStatement extends SmartStatement
         int opcode = Type.getType(descriptor).getOpcode(Opcodes.ISTORE);
         collector.add(new VarInstruction(opcode, var.index));
     }
-
-//    public Operation[] getChildren()
-//    {
-//        return new Operation[] { _expression };
-//    }
-//
-//    public boolean hasDescendant(Operation child)
-//    {
-//        return _expression.hasDescendant(child) || _expression == child;
-//    }
-//
-//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (hasDescendant(checkPoint))
-//        {
-//            _expression.restoreStack(stack, collector, checkPoint);
-//        }
-//    }
-//
-//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        if (hasDescendant(checkPoint))
-//        {
-//            _expression.saveStack(stack, collector, checkPoint);
-//        }
-//    }
-
 }

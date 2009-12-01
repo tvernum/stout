@@ -23,5 +23,6 @@ package org.adjective.stout.core;
 public interface TypeParameter extends ExtendedType
 {
     public String getName();
+
     public ExtendedType[] getSuperTypes();
 }

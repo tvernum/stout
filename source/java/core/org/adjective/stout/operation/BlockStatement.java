@@ -39,42 +39,4 @@ public class BlockStatement extends SmartStatement implements Statement
             statement.getInstructions(stack, collector);
         }
     }
-
-//    public Operation[] getChildren()
-//    {
-//        return _statements;
-//    }
-//
-//    public boolean hasDescendant(Operation child)
-//    {
-//        for (Operation operation : _statements)
-//        {
-//            if (operation.hasDescendant(child))
-//            {
-//                return true;
-//            }
-//            if (operation == child)
-//            {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        for (Statement statement : _statements)
-//        {
-//            statement.restoreStack(stack, collector, checkPoint);
-//        }
-//    }
-//
-//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        for (Statement statement : _statements)
-//        {
-//            statement.saveStack(stack, collector, checkPoint);
-//        }
-//    }
-
 }

@@ -50,23 +50,4 @@ public class ConstantClassExpression extends SmartExpression implements Expressi
         new LoadConstantInstruction(Type.getType(_class.getDescriptor())).getInstructions(stack, collector);
     }
 
-//    public boolean hasDescendant(Operation child)
-//    {
-//        return false;
-//    }
-//
-//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        int var = stack.currentBlock().getIndexInFrame(new SaveVariable(this, 1, CLASS_TYPE));
-//        int opcode = Opcodes.ALOAD;
-//        collector.add(new VarInstruction(opcode, var));
-//    }
-//
-//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
-//    {
-//        int var = stack.currentBlock().declareVariable(new SaveVariable(this, 1, CLASS_TYPE));
-//        int opcode = Opcodes.ASTORE;
-//        collector.add(new VarInstruction(opcode, var));
-//    }
-
 }

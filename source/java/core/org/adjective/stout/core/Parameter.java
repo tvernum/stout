@@ -20,6 +20,8 @@ package org.adjective.stout.core;
 public interface Parameter
 {
     public String getName();
+
     public UnresolvedType getType();
+
     public AnnotationDescriptor[] getAnnotations();
 }

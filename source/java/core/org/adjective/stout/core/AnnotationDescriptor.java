@@ -27,10 +27,13 @@ public interface AnnotationDescriptor
     public interface Attribute
     {
         public String getName();
+
         public Object getValue();
     }
 
     public Class< ? extends Annotation> getType();
+
     public Attribute[] getAttributes();
+
     public boolean isRuntime();
 }
