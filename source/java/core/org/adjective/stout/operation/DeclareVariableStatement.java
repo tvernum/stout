@@ -25,12 +25,12 @@ import org.adjective.stout.core.ExecutionStack.LocalVariable;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class DeclareVariableOperation extends SmartStatement implements LocalVariable
+public class DeclareVariableStatement extends SmartStatement implements LocalVariable
 {
     private final ExtendedType _type;
     private final String _name;
 
-    public DeclareVariableOperation(ExtendedType type, String name)
+    public DeclareVariableStatement(ExtendedType type, String name)
     {
         _type = type;
         _name = name;

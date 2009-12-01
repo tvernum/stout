@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import org.adjective.stout.core.ClassDescriptor;
@@ -36,15 +37,33 @@ import org.adjective.stout.core.MethodSignature;
  */
 public class CodeStack implements ExecutionStack
 {
+    public class VariableInfo
+    {
+        public final LocalVariable variable;
+        public final Label start;
+        public final Label end;
+        public final int index;
+
+        public VariableInfo(LocalVariable var, Label startLabel, Label endLabel, int idx)
+        {
+            this.variable = var;
+            this.start = startLabel;
+            this.end = endLabel;
+            this.index = idx;
+        }
+    }
+
     public class CodeBlock implements Block
     {
+        private final Label _location;
         private final int _startIndex;
         private final List<LocalVariable> _vars;
         private final Label _continueLabel;
         private final Label _breakLabel;
 
-        public CodeBlock(int startIndex, Label continueLabel, Label breakLabel)
+        public CodeBlock(Label location, int startIndex, Label continueLabel, Label breakLabel)
         {
+            _location = location;
             _startIndex = startIndex;
             _continueLabel = continueLabel;
             _breakLabel = breakLabel;
@@ -100,17 +119,25 @@ public class CodeStack implements ExecutionStack
             return _continueLabel;
         }
 
+        public Label getLocation()
+        {
+            return _location;
+        }
     }
 
     private final ClassDescriptor _cls;
     private final MethodDescriptor _method;
+    private final MethodVisitor _visitor;
     private final List<CodeBlock> _blocks;
+    private final List<VariableInfo> _variableTable;
 
-    public CodeStack(ClassDescriptor cls, MethodDescriptor method)
+    public CodeStack(ClassDescriptor cls, MethodDescriptor method, MethodVisitor visitor)
     {
         _cls = cls;
         _method = method;
+        _visitor = visitor;
         _blocks = new ArrayList<CodeBlock>();
+        _variableTable = new ArrayList<VariableInfo>();
     }
 
     public Iterable< ? extends Block> blocks()
@@ -135,11 +162,22 @@ public class CodeStack implements ExecutionStack
 
     public void popBlock(Block block)
     {
-        if (block != currentBlock())
+        CodeBlock current = currentBlock();
+        if (block != current)
         {
             throw new IllegalArgumentException("Attempt to pop block that is not the current block");
         }
         _blocks.remove(0);
+        declareLocalVariables(current, getLocation());
+    }
+
+    private void declareLocalVariables(CodeBlock block, Label endLocation)
+    {
+        Collection< ? extends LocalVariable> variables = block.getVariables();
+        for (LocalVariable var : variables)
+        {
+            _variableTable.add(new VariableInfo(var, block.getLocation(), endLocation, block.getIndexInFrame(var)));
+        }
     }
 
     public Block pushBlock()
@@ -150,9 +188,24 @@ public class CodeStack implements ExecutionStack
     public Block pushBlock(Label continueLabel, Label breakLabel)
     {
         int index = _blocks.isEmpty() ? 0 : currentBlock().getNextIndex();
-        CodeBlock block = new CodeBlock(index, continueLabel, breakLabel);
+        CodeBlock block = new CodeBlock(getLocation(), index, continueLabel, breakLabel);
         _blocks.add(0, block);
         return block;
+    }
+
+    private Label getLocation()
+    {
+        Label location = new Label();
+        _visitor.visitLabel(location);
+        return location;
+    }
+
+    public void declareVariableInfo()
+    {
+        for (VariableInfo info : _variableTable)
+        {
+            _visitor.visitLocalVariable(info.variable.name(), info.variable.type().getDescriptor(), null, info.start, info.end, info.index);
+        }
     }
 
 }

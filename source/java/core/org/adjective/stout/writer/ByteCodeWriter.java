@@ -167,7 +167,7 @@ public class ByteCodeWriter
 
         mv.visitCode();
 
-        ExecutionStack stack = new CodeStack(cls, method);
+        ExecutionStack stack = new CodeStack(cls, method, mv);
         Block block = stack.pushBlock();
         if (!isStatic(method))
         {

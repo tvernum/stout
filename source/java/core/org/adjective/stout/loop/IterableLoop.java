@@ -31,7 +31,7 @@ import org.adjective.stout.instruction.GenericInstruction;
 import org.adjective.stout.instruction.JumpInstruction;
 import org.adjective.stout.instruction.LabelInstruction;
 import org.adjective.stout.operation.AssignVariableStatement;
-import org.adjective.stout.operation.DeclareVariableOperation;
+import org.adjective.stout.operation.DeclareVariableStatement;
 import org.adjective.stout.operation.DuplicateStackExpression;
 import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.InvokeVirtualExpression;
@@ -69,7 +69,7 @@ public class IterableLoop extends SmartStatement
         iterator.getInstructions(stack, collector);
         if (_iteratorName != null)
         {
-            new DeclareVariableOperation(new ParameterisedClassImpl(Iterator.class), _iteratorName).getInstructions(stack, collector);
+            new DeclareVariableStatement(new ParameterisedClassImpl(Iterator.class), _iteratorName).getInstructions(stack, collector);
             new AssignVariableStatement(_iteratorName, new DuplicateStackExpression()).getInstructions(stack, collector);
         }
 
@@ -81,7 +81,7 @@ public class IterableLoop extends SmartStatement
         Expression hasNext = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), HAS_NEXT_METHOD);
         new ExpressionCondition(hasNext).jumpWhenFalse(endLoop).getInstructions(stack, collector);
 
-        new DeclareVariableOperation(new ParameterisedClassImpl(Object.class), _valueName).getInstructions(stack, collector);
+        new DeclareVariableStatement(new ParameterisedClassImpl(Object.class), _valueName).getInstructions(stack, collector);
         Expression next = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
         new AssignVariableStatement(_valueName, next).getInstructions(stack, collector);
 

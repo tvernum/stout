@@ -62,7 +62,7 @@ public class StatementOperations
 
     public ElementBuilder<Statement> declareVariable(ExtendedType type, CharSequence name)
     {
-        return new DeclareVariableOperation(type, name.toString());
+        return new DeclareVariableStatement(type, name.toString());
     }
 
     public ElementBuilder<Statement> declareVariable(ElementBuilder< ? extends ExtendedType> type, CharSequence name)
@@ -72,7 +72,7 @@ public class StatementOperations
 
     public ElementBuilder<Statement> declareVariable(Class< ? > type, CharSequence name)
     {
-        return new DeclareVariableOperation(new ParameterisedClassImpl(type), name.toString());
+        return new DeclareVariableStatement(new ParameterisedClassImpl(type), name.toString());
     }
 
     public ElementBuilder<Statement> assignVariable(CharSequence name, Expression expression)

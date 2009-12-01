@@ -29,29 +29,24 @@ public interface ExecutionStack
     public interface LocalVariable
     {
         public String name();
-
         public UnresolvedType type();
     }
 
     public interface Block
     {
         public Collection< ? extends LocalVariable> getVariables();
-
         public int getIndexInFrame(LocalVariable var);
 
         public LocalVariable getVariable(String name);
-
         public int declareVariable(LocalVariable var);
 
         public Label continueLabel();
-
         public Label breakLabel();
     }
 
     public Block currentBlock();
 
     public Block pushBlock();
-
     public Block pushBlock(Label continueLabel, Label breakLabel);
 
     public void popBlock(Block block);
@@ -60,7 +55,6 @@ public interface ExecutionStack
     public Iterable< ? extends Block> blocks();
 
     public MethodSignature currentMethod();
-
     public ClassDescriptor currentClass();
 
 }
