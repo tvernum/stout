@@ -63,7 +63,7 @@ public class IterableLoop extends SmartStatement
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        stack.pushBlock();
+        Block block1 = stack.pushBlock();
 
         Expression iterator = new InvokeVirtualExpression(_iterable, new ParameterisedClassImpl(Iterable.class), ITERATOR_METHOD);
         iterator.getInstructions(stack, collector);
@@ -85,16 +85,17 @@ public class IterableLoop extends SmartStatement
         Expression next = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
         new AssignVariableStatement(_valueName, next).getInstructions(stack, collector);
 
-        Block block = stack.pushBlock(nextLoop, endLoop);
+        Block block2 = stack.pushBlock(nextLoop, endLoop);
         for (Statement stmt : _body)
         {
             stmt.getInstructions(stack, collector);
         }
-        stack.popBlock(block);
+        stack.popBlock(block2);
 
         collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
         collector.add(new LabelInstruction(endLoop));
         collector.add(new GenericInstruction(Opcodes.POP));
+        stack.popBlock(block1);
     }
 
 }
