@@ -37,6 +37,7 @@ import org.adjective.stout.load.StoutClassLoader;
 import org.adjective.stout.loop.ConditionalOperations;
 import org.adjective.stout.operation.ExpressionOperations;
 import org.adjective.stout.operation.StatementOperations;
+import org.adjective.stout.operation.VM;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -125,5 +126,47 @@ public class IntegrationTest1
 
         Assert.assertTrue(instance instanceof BaseClass);
         Assert.assertEquals(5, ((BaseClass) instance).m_ii(5));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void simpleTryCatch() throws Exception
+    {
+        String packageName = "org.adjective.stout.test";
+        String className = "SimpleClass2";
+
+        String methodName = "foo";
+        ClassDescriptor cls =
+        /*    */new ClassSpec(packageName, className)
+        /*      */.withModifiers(ElementModifier.PUBLIC)
+        /*      */.withSuperClass(BaseClass.class)
+        /*      */.withDefaultConstructor(ElementModifier.PUBLIC)
+        /*      */.withMethod(
+        /*         */new MethodSpec(methodName)
+        /*           */.withModifiers(ElementModifier.PUBLIC)
+        /*           */.withReturnType(Void.TYPE)
+        /*           */.withBody(
+        /*              */VM.Statement.attempt(
+        /*                */VM.Statement.ignore(VM.Expression.thisObject())
+        /*              */).on(new ParameterisedClassImpl(NullPointerException.class), VM.Statement.returnVoid()),
+        /*              */VM.Statement.returnVoid()
+        /*           */)
+        /*       */).create();
+
+        StoutClassLoader loader = new StoutClassLoader();
+        Class< ? > loaded = loader.defineClass(cls);
+
+        // Check loaded correctly...
+        Assert.assertNotNull(loaded);
+        Assert.assertEquals(packageName + "." + className, loaded.getName());
+
+        // Check method exists
+        Method[] loadedMethods = loaded.getDeclaredMethods();
+        Assert.assertEquals(1, loadedMethods.length);
+        Assert.assertEquals(methodName, loadedMethods[0].getName());
+
+        Object instance = loaded.newInstance();
+        Assert.assertNotNull(instance);
+        loadedMethods[0].invoke(instance);
     }
 }

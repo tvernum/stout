@@ -28,4 +28,9 @@ public abstract class SmartExpression implements Expression, ElementBuilder<Expr
     {
         return this;
     }
+    
+    public int getResultingStackSize()
+    {
+        return 1;
+    }
 }

@@ -30,7 +30,7 @@ import org.adjective.stout.impl.ParameterisedClassImpl;
 import org.adjective.stout.instruction.GenericInstruction;
 import org.adjective.stout.instruction.JumpInstruction;
 import org.adjective.stout.instruction.LabelInstruction;
-import org.adjective.stout.operation.AssignVariableOperation;
+import org.adjective.stout.operation.AssignVariableStatement;
 import org.adjective.stout.operation.DeclareVariableOperation;
 import org.adjective.stout.operation.DuplicateStackExpression;
 import org.adjective.stout.operation.Expression;
@@ -70,7 +70,7 @@ public class IterableLoop extends SmartStatement
         if (_iteratorName != null)
         {
             new DeclareVariableOperation(new ParameterisedClassImpl(Iterator.class), _iteratorName).getInstructions(stack, collector);
-            new AssignVariableOperation(_iteratorName, new DuplicateStackExpression()).getInstructions(stack, collector);
+            new AssignVariableStatement(_iteratorName, new DuplicateStackExpression()).getInstructions(stack, collector);
         }
 
         Label nextLoop = new Label();
@@ -83,7 +83,7 @@ public class IterableLoop extends SmartStatement
 
         new DeclareVariableOperation(new ParameterisedClassImpl(Object.class), _valueName).getInstructions(stack, collector);
         Expression next = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
-        new AssignVariableOperation(_valueName, next).getInstructions(stack, collector);
+        new AssignVariableStatement(_valueName, next).getInstructions(stack, collector);
 
         Block block = stack.pushBlock(nextLoop, endLoop);
         for (Statement stmt : _body)

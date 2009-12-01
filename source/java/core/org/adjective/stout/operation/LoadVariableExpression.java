@@ -89,7 +89,7 @@ public class LoadVariableExpression extends SmartExpression implements ElementBu
 
     public Statement assign(Expression value)
     {
-        return new AssignVariableOperation(_name, value);
+        return new AssignVariableStatement(_name, value);
     }
 
     public String toString()

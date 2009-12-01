@@ -35,4 +35,11 @@ public class GenericInstruction extends AbstractInstruction implements Instructi
     {
         visitor.visitInsn(getOpCode());
     }
+
+//    public StackChange getStackChange()
+//    {
+//        switch(getOpCode()) {
+//            
+//        }
+//    }
 }

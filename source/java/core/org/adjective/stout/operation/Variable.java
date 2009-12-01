@@ -44,4 +44,8 @@ public class Variable implements ExecutionStack.LocalVariable
         return _type;
     }
 
+    public String toString()
+    {
+        return String.valueOf(_type) + ' ' + _name;
+    }
 }

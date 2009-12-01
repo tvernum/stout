@@ -15,36 +15,45 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
+package org.adjective.stout.operation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.core.Code;
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.Operation;
+import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.operation.TryCatch.Catch;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class CodeImpl implements Code, ElementBuilder<Code>
+public class TryCatchSpec implements ElementBuilder<TryCatch>
 {
-    private final Operation[] _operations;
+    private final Statement _body;
+    private final List<TryCatch.Catch> _catches;
 
-    public CodeImpl(Operation... operations)
+    public TryCatchSpec(Statement body)
     {
-        _operations = operations;
+        _body = body;
+        _catches = new ArrayList<TryCatch.Catch>(3);
     }
 
-    public Code create()
+    public TryCatch create()
     {
+        Catch[] array = _catches.toArray(new TryCatch.Catch[_catches.size()]);
+        return new TryCatch(_body, array);
+    }
+
+    public TryCatchSpec on(UnresolvedType exception, ElementBuilder<Statement> body)
+    {
+        TryCatch.Catch c = new TryCatch.Catch(exception, body.create());
+        _catches.add(c);
         return this;
     }
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public TryCatchSpec on(UnresolvedType exception, ElementBuilder<Statement>... body)
     {
-        for (Operation operation : _operations)
-        {
-            operation.getInstructions(stack, collector);
-        }
+        return on(exception, VM.Statement.block(body));
     }
+
 }

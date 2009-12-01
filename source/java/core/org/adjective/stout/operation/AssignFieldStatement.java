@@ -29,7 +29,7 @@ import org.adjective.stout.instruction.FieldInstruction;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class AssignFieldOperation extends SmartStatement implements ElementBuilder<Statement>
+public class AssignFieldStatement extends SmartStatement implements ElementBuilder<Statement>
 {
     private final UnresolvedType _owner;
     private final Expression _target;
@@ -37,7 +37,7 @@ public class AssignFieldOperation extends SmartStatement implements ElementBuild
     private final UnresolvedType _fieldType;
     private final Expression _expression;
 
-    public AssignFieldOperation(UnresolvedType owner, Expression target, String fieldName, UnresolvedType fieldType, Expression expression)
+    public AssignFieldStatement(UnresolvedType owner, Expression target, String fieldName, UnresolvedType fieldType, Expression expression)
     {
         _owner = owner;
         _target = target;
@@ -74,4 +74,33 @@ public class AssignFieldOperation extends SmartStatement implements ElementBuild
         _expression.getInstructions(stack, collector);
         collector.add(new FieldInstruction(Opcodes.PUTFIELD, owner.getInternalName(), _fieldName, type.getDescriptor()));
     }
+
+//    public Operation[] getChildren()
+//    {
+//        return new Operation[] { (_target == null) ? ThisExpression.INSTANCE : _target, _expression };
+//    }
+//
+//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
+//    {
+//        if (hasDescendant(checkPoint))
+//        {
+//            _target.restoreStack(stack, collector, checkPoint);
+//            _expression.restoreStack(stack, collector, checkPoint);
+//        }
+//    }
+//
+//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
+//    {
+//        if (hasDescendant(checkPoint))
+//        {
+//            _target.saveStack(stack, collector, checkPoint);
+//            _expression.saveStack(stack, collector, checkPoint);
+//        }
+//    }
+//
+//    public boolean hasDescendant(Operation child)
+//    {
+//        return _target.hasDescendant(child) || _expression.hasDescendant(child) || _target == child || _expression == child;
+//    }
+
 }

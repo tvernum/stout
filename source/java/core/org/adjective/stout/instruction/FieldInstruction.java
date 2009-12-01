@@ -43,4 +43,20 @@ public class FieldInstruction extends AbstractInstruction implements Instruction
         visitor.visitFieldInsn(getOpCode(), _owner, _fieldName, _fieldType);
     }
 
+//    public StackChange getStackChange()
+//    {
+//        switch (getOpCode())
+//        {
+//            case Opcodes.GETFIELD:
+//                return pop(OperandType.OBJECT).push(_fieldType);
+//            case Opcodes.PUTFIELD:
+//                return pop(OperandType.OBJECT).pop(_fieldType);
+//            case Opcodes.GETSTATIC:
+//                return pop().push(_fieldType);
+//            case Opcodes.PUTSTATIC:
+//                return pop(_fieldType);
+//        }
+//        throw new IllegalStateException("Unknown opcode '" + getOpCode() + "'");
+//    }
+
 }

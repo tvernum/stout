@@ -19,6 +19,7 @@ package org.adjective.stout.operation;
 
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.Operation;
 import org.adjective.stout.core.UnresolvedType;
 
 /**
@@ -26,13 +27,22 @@ import org.adjective.stout.core.UnresolvedType;
  */
 public class ChainExpression extends SmartExpression implements Expression
 {
+    private final Operation[] _first;
+    private final Operation[] _second;
     private final Expression _expression;
-    private final Statement[] _statements;
 
     public ChainExpression(Expression expression, Statement... statements)
     {
         _expression = expression;
-        _statements = statements;
+        _first = new Operation[] { expression };
+        _second = statements;
+    }
+
+    public ChainExpression(Statement[] statementArray, Expression expression)
+    {
+        _expression = expression;
+        _first = statementArray;
+        _second = new Operation[] { expression };
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
@@ -42,11 +52,88 @@ public class ChainExpression extends SmartExpression implements Expression
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        _expression.getInstructions(stack, collector);
-        for (Statement statement : _statements)
+        for (Operation op : _first)
         {
-            statement.getInstructions(stack, collector);
+            op.getInstructions(stack, collector);
+        }
+        for (Operation op : _second)
+        {
+            op.getInstructions(stack, collector);
         }
     }
 
+//    public boolean hasDescendant(Operation child)
+//    {
+//        for (Operation op : _first)
+//        {
+//            if (hasDescendant(child, op))
+//            {
+//                return true;
+//            }
+//        }
+//        for (Operation op : _second)
+//        {
+//            if (hasDescendant(child, op))
+//            {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private boolean hasDescendant(Operation child, Operation op)
+//    {
+//        return op.hasDescendant(child) || op == child;
+//    }
+//
+//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
+//    {
+//        if (checkPoint == this)
+//        {
+//            return;
+//        }
+//
+//        for (Operation op : _first)
+//        {
+//            op.restoreStack(stack, collector, checkPoint);
+//            if (hasDescendant(checkPoint, op))
+//            {
+//                return;
+//            }
+//        }
+//        for (Operation op : _second)
+//        {
+//            op.restoreStack(stack, collector, checkPoint);
+//            if (hasDescendant(checkPoint, op))
+//            {
+//                return;
+//            }
+//        }
+//
+//    }
+//
+//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
+//    {
+//        if (checkPoint == this)
+//        {
+//            return;
+//        }
+//
+//        for (Operation op : _first)
+//        {
+//            op.saveStack(stack, collector, checkPoint);
+//            if (hasDescendant(checkPoint, op))
+//            {
+//                return;
+//            }
+//        }
+//        for (Operation op : _second)
+//        {
+//            op.saveStack(stack, collector, checkPoint);
+//            if (hasDescendant(checkPoint, op))
+//            {
+//                return;
+//            }
+//        }
+//    }
 }

@@ -18,43 +18,25 @@
 package org.adjective.stout.operation;
 
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.exception.OperationException;
-import org.adjective.stout.instruction.VarInstruction;
-import org.adjective.stout.operation.VariableResolver.StackVariable;
+import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.instruction.GenericInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class AssignVariableOperation extends SmartStatement
+public class PopExpression extends SmartExpression implements Expression
 {
-    private final String _name;
-    private final Expression _expression;
-
-    public AssignVariableOperation(String name, Expression expression)
+    public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        _name = name;
-        _expression = expression;
+        return UnknownType.INSTANCE;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        StackVariable var = new VariableResolver(stack).findVariable(_name);
-        if (var == null)
-        {
-            throw new OperationException("No such variable " + _name + " on stack");
-        }
-        getInstructions(stack, var, collector);
+        collector.add(new GenericInstruction(Opcodes.POP));
     }
 
-    private void getInstructions(ExecutionStack stack, StackVariable var, InstructionCollector collector)
-    {
-        _expression.getInstructions(stack, collector);
-        String descriptor = var.variable.type().getDescriptor();
-        int opcode = Type.getType(descriptor).getOpcode(Opcodes.ISTORE);
-        collector.add(new VarInstruction(opcode, var.index));
-    }
 }

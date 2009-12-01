@@ -77,12 +77,12 @@ public class StatementOperations
 
     public ElementBuilder<Statement> assignVariable(CharSequence name, Expression expression)
     {
-        return new AssignVariableOperation(name.toString(), expression);
+        return new AssignVariableStatement(name.toString(), expression);
     }
 
     public ElementBuilder<Statement> assignField(CharSequence name, Expression expression)
     {
-        return new AssignFieldOperation(null, null, name.toString(), null, expression);
+        return new AssignFieldStatement(null, null, name.toString(), null, expression);
     }
 
     public ElementBuilder<Statement> assignVariable(CharSequence name, ElementBuilder< ? extends Expression> expression)
@@ -179,6 +179,21 @@ public class StatementOperations
     public ElementBuilder<Statement> block(List<ElementBuilder< ? extends Statement>> statements)
     {
         return new BlockStatement(toStatementArray(statements));
+    }
+
+    public ElementBuilder<Statement> block(ElementBuilder<Statement>... statements)
+    {
+        return new BlockStatement(toStatementArray(statements));
+    }
+
+    public TryCatchSpec attempt(ElementBuilder<Statement>... body)
+    {
+        return attempt(block(body).create());
+    }
+
+    public TryCatchSpec attempt(Statement body)
+    {
+        return new TryCatchSpec(body);
     }
 
 }

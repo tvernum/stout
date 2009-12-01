@@ -163,4 +163,9 @@ public class ClassImpl implements ClassDescriptor
     {
         return _outerClass;
     }
+    
+    public String toString()
+    {
+        return _name;
+    }
 }

@@ -18,6 +18,7 @@
 package org.adjective.stout.instruction;
 
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.util.AbstractVisitor;
 
 import org.adjective.stout.core.Instruction;
 import org.adjective.stout.core.UnresolvedType;
@@ -43,6 +44,11 @@ public class TypeInstruction extends AbstractInstruction implements Instruction
     public void accept(MethodVisitor visitor)
     {
         visitor.visitTypeInsn(getOpCode(), _type);
+    }
+
+    public String toString()
+    {
+        return getClass().getSimpleName() + ' ' + AbstractVisitor.OPCODES[getOpCode()] + ' ' + _type;
     }
 
 }

@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="source/java/core"/>
 	<classpathentry kind="src" path="source/java/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/asm-all-3.1.jar" sourcepath="/Users/tim/Development/Libraries/asm/3.1/src.zip"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asm3"/>
 	<classpathentry kind="output" path="output/eclipse"/>
 </classpath>

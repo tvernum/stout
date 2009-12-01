@@ -15,36 +15,51 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
-
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.core.Code;
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.Operation;
+package org.adjective.stout.core;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class CodeImpl implements Code, ElementBuilder<Code>
+public enum OperandType
 {
-    private final Operation[] _operations;
+    VOID(0, 0, 'V'), INT(1, 1, 'I'), LONG(2, 2, 'J'), FLOAT(3, 1, 'F'), DOUBLE(4, 2, 'D'), OBJECT(5, 1, 'L'), BYTE(6, 1, 'B'), CHAR(7, 1, 'C'),
+    SHORT(8, 1, 'S'), BOOLEAN(1, 1, 'Z'), ARRAY(5, 1, '[');
 
-    public CodeImpl(Operation... operations)
+    private final int _opCodeOffset;
+    private final int _size;
+    private final char _descriptorChar;
+
+    private OperandType(int code, int size, char descriptorChar)
     {
-        _operations = operations;
+        _opCodeOffset = code;
+        _size = size;
+        _descriptorChar = descriptorChar;
     }
 
-    public Code create()
+    public int getOpCodeOffset()
     {
-        return this;
+        return _opCodeOffset;
     }
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public int getSize()
     {
-        for (Operation operation : _operations)
+        return _size;
+    }
+
+    public char getDescriptorChar()
+    {
+        return _descriptorChar;
+    }
+
+    public static OperandType forDescriptor(char ch)
+    {
+        for (OperandType type : values())
         {
-            operation.getInstructions(stack, collector);
+            if (type.getDescriptorChar() == ch)
+            {
+                return type;
+            }
         }
+        return null;
     }
 }

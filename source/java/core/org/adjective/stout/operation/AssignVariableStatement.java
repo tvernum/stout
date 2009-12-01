@@ -17,63 +17,70 @@
 
 package org.adjective.stout.operation;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.exception.OperationException;
+import org.adjective.stout.instruction.VarInstruction;
+import org.adjective.stout.operation.VariableResolver.StackVariable;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class BlockStatement extends SmartStatement implements Statement
+public class AssignVariableStatement extends SmartStatement
 {
-    private final Statement[] _statements;
+    private final String _name;
+    private final Expression _expression;
 
-    public BlockStatement(Statement[] statements)
+    public AssignVariableStatement(String name, Expression expression)
     {
-        _statements = statements;
+        _name = name;
+        _expression = expression;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        for (Statement statement : _statements)
+        StackVariable var = new VariableResolver(stack).findVariable(_name);
+        if (var == null)
         {
-            statement.getInstructions(stack, collector);
+            throw new OperationException("No such variable " + _name + " on stack");
         }
+        getInstructions(stack, var, collector);
+    }
+
+    private void getInstructions(ExecutionStack stack, StackVariable var, InstructionCollector collector)
+    {
+        _expression.getInstructions(stack, collector);
+        String descriptor = var.variable.type().getDescriptor();
+        int opcode = Type.getType(descriptor).getOpcode(Opcodes.ISTORE);
+        collector.add(new VarInstruction(opcode, var.index));
     }
 
 //    public Operation[] getChildren()
 //    {
-//        return _statements;
+//        return new Operation[] { _expression };
 //    }
 //
 //    public boolean hasDescendant(Operation child)
 //    {
-//        for (Operation operation : _statements)
-//        {
-//            if (operation.hasDescendant(child))
-//            {
-//                return true;
-//            }
-//            if (operation == child)
-//            {
-//                return true;
-//            }
-//        }
-//        return false;
+//        return _expression.hasDescendant(child) || _expression == child;
 //    }
 //
 //    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
 //    {
-//        for (Statement statement : _statements)
+//        if (hasDescendant(checkPoint))
 //        {
-//            statement.restoreStack(stack, collector, checkPoint);
+//            _expression.restoreStack(stack, collector, checkPoint);
 //        }
 //    }
 //
 //    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint)
 //    {
-//        for (Statement statement : _statements)
+//        if (hasDescendant(checkPoint))
 //        {
-//            statement.saveStack(stack, collector, checkPoint);
+//            _expression.saveStack(stack, collector, checkPoint);
 //        }
 //    }
 

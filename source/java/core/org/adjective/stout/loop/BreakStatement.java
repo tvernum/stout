@@ -22,6 +22,7 @@ import org.objectweb.asm.Opcodes;
 
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.Operation;
 import org.adjective.stout.core.ExecutionStack.Block;
 import org.adjective.stout.exception.OperationException;
 import org.adjective.stout.instruction.JumpInstruction;
@@ -44,6 +45,11 @@ public class BreakStatement extends SmartStatement
             }
         }
         throw new OperationException("No label to break to");
+    }
+    
+    public Operation[] getChildren()
+    {
+        return NO_CHILDREN;
     }
 
 }

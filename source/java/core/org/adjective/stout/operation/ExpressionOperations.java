@@ -17,6 +17,8 @@
 
 package org.adjective.stout.operation;
 
+import java.util.List;
+
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.builder.MethodSpec;
 import org.adjective.stout.core.ConstructorSignature;
@@ -176,6 +178,11 @@ public class ExpressionOperations
         return new ChainExpression(expression, statements);
     }
 
+    public Expression chain(List<ElementBuilder<? extends Statement>> statements, Expression expression)
+    {
+        return new ChainExpression(StatementOperations.toStatementArray(statements), expression);
+    }
+
     public Expression thisObject()
     {
         return ThisExpression.INSTANCE;
@@ -189,6 +196,11 @@ public class ExpressionOperations
     public Expression cast(UnresolvedType type, Expression expression)
     {
         return new CastExpression(type, expression);
+    }
+
+    public Expression pop()
+    {
+        return new PopExpression();
     }
 
 }

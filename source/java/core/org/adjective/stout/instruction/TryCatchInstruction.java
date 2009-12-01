@@ -15,36 +15,36 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
+package org.adjective.stout.instruction;
 
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.core.Code;
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.Operation;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+
+import org.adjective.stout.core.Instruction;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class CodeImpl implements Code, ElementBuilder<Code>
+public class TryCatchInstruction extends AbstractInstruction implements Instruction
 {
-    private final Operation[] _operations;
+    private final Label _start;
+    private final Label _end;
+    private final UnresolvedType _type;
+    private final Label _handler;
 
-    public CodeImpl(Operation... operations)
+    public TryCatchInstruction(Label start, Label end, UnresolvedType type, Label handler)
     {
-        _operations = operations;
+        // There is no "try-catch" opcode, the handler table is encoded in the method header 
+        super(0);
+        _start = start;
+        _end = end;
+        _type = type;
+        _handler = handler;
     }
 
-    public Code create()
+    public void accept(MethodVisitor visitor)
     {
-        return this;
-    }
-
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
-    {
-        for (Operation operation : _operations)
-        {
-            operation.getInstructions(stack, collector);
-        }
+        visitor.visitTryCatchBlock(_start, _end, _handler, _type.getInternalName());
     }
 }

@@ -54,7 +54,7 @@ import org.adjective.stout.operation.Variable;
 public class ByteCodeWriter
 {
     private boolean _trace = false;
-    private boolean _check = true;
+    private boolean _check = false;
 
     public void setTrace(boolean trace)
     {
@@ -78,7 +78,7 @@ public class ByteCodeWriter
         {
             cv = new CheckClassAdapter(cv);
         }
-        
+
         String signature = null; // @TODO
         cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers()), cls.getInternalName(), signature, getInternalName(cls.getSuperClass()),
                 getInterfaceNames(cls));

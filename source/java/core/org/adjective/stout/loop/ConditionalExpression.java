@@ -63,5 +63,4 @@ public class ConditionalExpression extends SmartExpression implements Expression
         _whenFalse.getInstructions(stack, collector);
         collector.add(new LabelInstruction(endLabel));
     }
-
 }

@@ -15,36 +15,25 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
+package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.core.Code;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.Operation;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class CodeImpl implements Code, ElementBuilder<Code>
+public class NothingExpression extends SmartExpression implements Expression
 {
-    private final Operation[] _operations;
-
-    public CodeImpl(Operation... operations)
+    public UnresolvedType getExpressionType(ExecutionStack stack)
     {
-        _operations = operations;
-    }
-
-    public Code create()
-    {
-        return this;
+        return UnknownType.INSTANCE;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        for (Operation operation : _operations)
-        {
-            operation.getInstructions(stack, collector);
-        }
+        // Do nothing
     }
+
 }

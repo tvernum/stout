@@ -17,7 +17,6 @@
 
 package org.adjective.stout.operation;
 
-
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.InstructionCollector;
@@ -50,6 +49,11 @@ public class DeclareVariableOperation extends SmartStatement implements LocalVar
     public ExtendedType type()
     {
         return _type;
+    }
+
+    public String toString()
+    {
+        return String.valueOf(_type) + ' ' + _name;
     }
 
 }

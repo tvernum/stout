@@ -32,7 +32,7 @@ public class DuplicateStackExpression implements Expression
     public UnresolvedType getExpressionType(ExecutionStack stack)
     {
         // Don't know the type...
-        return null;
+        return UnknownType.INSTANCE;
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)

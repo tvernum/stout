@@ -15,36 +15,39 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.impl;
+package org.adjective.stout.operation;
 
-import org.adjective.stout.builder.ElementBuilder;
-import org.adjective.stout.core.Code;
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.Operation;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class CodeImpl implements Code, ElementBuilder<Code>
+public class UnknownType implements UnresolvedType
 {
-    private final Operation[] _operations;
-
-    public CodeImpl(Operation... operations)
+    public static final UnknownType INSTANCE = new UnknownType();
+    public boolean canAssignTo(UnresolvedType type)
     {
-        _operations = operations;
+        return true; // Maybe ?
     }
 
-    public Code create()
+    public String getDescriptor()
     {
-        return this;
+        return null;
     }
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public UnresolvedType getFieldType(String fieldName)
     {
-        for (Operation operation : _operations)
-        {
-            operation.getInstructions(stack, collector);
-        }
+        return INSTANCE;
     }
+
+    public String getInternalName()
+    {
+        return null;
+    }
+
+    public Sort getSort()
+    {
+        return Sort.CLASS;
+    }
+
 }

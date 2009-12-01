@@ -20,7 +20,9 @@ package org.adjective.stout.tools;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -66,6 +68,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
     private final Type _superType;
     private final boolean _isStatic;
     private final Type[] _arguments;
+    private final Map<Label, StringBuilder> _labels;
 
     public StackVisualiserMethodVisitor(PrintStream output, Type thisType, Type superType, boolean isStatic, Type[] arguments)
     {
@@ -75,6 +78,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
         _isStatic = isStatic;
         _arguments = arguments;
         _stack = new ArrayList<StackValue>();
+        _labels = new HashMap<Label, StringBuilder>();
     }
 
     public AnnotationVisitor visitAnnotation(String desc, boolean visible)
@@ -674,11 +678,21 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);
         }
         print(opcode, label.toString());
+        label(label, OPCODES[opcode]);
     }
 
     public void visitLabel(Label label)
     {
-        _output.println("-=[ " + label + " ]=-");
+        CharSequence message = _labels.get(label);
+        if (message == null)
+        {
+            message = "";
+        }
+        else
+        {
+            message = " : " + message;
+        }
+        _output.println("-=[ " + label + message + " ]=-");
         // No-op
     }
 
@@ -778,20 +792,40 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
 
     public void visitTryCatchBlock(Label start, Label end, Label handler, String type)
     {
-        throw new IllegalArgumentException("Unsupported instruction - Try/Catch");
+        print(0, "TRY(" + start + "," + end + ") CATCH(" + type + ") : " + handler);
+        label(start, "Try:START");
+        label(end, "Try:END");
+        label(handler, "Catch:" + type);
+    }
+
+    private void label(Label label, String message)
+    {
+        if (_labels.containsKey(label))
+        {
+            _labels.get(label).append(",").append(message);
+        }
+        else
+        {
+            _labels.put(label, new StringBuilder(message));
+        }
     }
 
     public void visitTypeInsn(int opcode, String type)
     {
         String description = type.replace('/', '.');
+        Type objectType = Type.getObjectType(type);
         switch (opcode)
         {
             case Opcodes.NEW:
-                push(simpleName(type), Type.getObjectType(type));
+                push(simpleName(type), objectType);
                 break;
             case Opcodes.ANEWARRAY:
                 StackValue size = pop(Type.INT_TYPE);
-                push(simpleName(type) + "[" + size.description + "]", arrayOf(Type.getObjectType(type)));
+                push(simpleName(type) + "[" + size.description + "]", arrayOf(objectType));
+                break;
+            case Opcodes.CHECKCAST:
+                StackValue pop = pop();
+                push("(" + type + ") " + pop.description, objectType);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported opcode " + OPCODES[opcode]);

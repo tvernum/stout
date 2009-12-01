@@ -18,10 +18,14 @@
 package org.adjective.stout.core;
 
 
+
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
 public interface Operation 
 {
     public void getInstructions(ExecutionStack stack, InstructionCollector collector);
+//    public void saveStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint);
+//    public void restoreStack(ExecutionStack stack, InstructionCollector collector, Operation checkPoint);
+//    public boolean hasDescendant(Operation child);
 }
