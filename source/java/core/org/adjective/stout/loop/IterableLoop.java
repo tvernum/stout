@@ -37,7 +37,6 @@ import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.InvokeVirtualExpression;
 import org.adjective.stout.operation.LoadVariableExpression;
 import org.adjective.stout.operation.NothingExpression;
-import org.adjective.stout.operation.PopExpression;
 import org.adjective.stout.operation.SmartStatement;
 import org.adjective.stout.operation.Statement;
 import org.adjective.stout.operation.VM;
