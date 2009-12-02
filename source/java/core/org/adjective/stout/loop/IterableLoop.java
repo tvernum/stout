@@ -35,6 +35,9 @@ import org.adjective.stout.operation.DeclareVariableStatement;
 import org.adjective.stout.operation.DuplicateStackExpression;
 import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.InvokeVirtualExpression;
+import org.adjective.stout.operation.LoadVariableExpression;
+import org.adjective.stout.operation.NothingExpression;
+import org.adjective.stout.operation.PopExpression;
 import org.adjective.stout.operation.SmartStatement;
 import org.adjective.stout.operation.Statement;
 import org.adjective.stout.operation.VM;
@@ -56,7 +59,7 @@ public class IterableLoop extends SmartStatement
     public IterableLoop(Expression iterable, String iteratorName, String valueName, Statement[] body)
     {
         _iterable = iterable;
-        _iteratorName = iteratorName;
+        _iteratorName = iteratorName == null ? "itr$" + System.identityHashCode(this) : iteratorName;
         _valueName = valueName;
         _body = body;
     }
@@ -66,23 +69,24 @@ public class IterableLoop extends SmartStatement
         Block block1 = stack.pushBlock();
 
         Expression iterator = new InvokeVirtualExpression(_iterable, new ParameterisedClassImpl(Iterable.class), ITERATOR_METHOD);
-        iterator.getInstructions(stack, collector);
-        if (_iteratorName != null)
-        {
-            new DeclareVariableStatement(new ParameterisedClassImpl(Iterator.class), _iteratorName).getInstructions(stack, collector);
-            new AssignVariableStatement(_iteratorName, new DuplicateStackExpression()).getInstructions(stack, collector);
-        }
+
+        DeclareVariableStatement declareIterator = new DeclareVariableStatement(new ParameterisedClassImpl(Iterator.class), _iteratorName);
+        AssignVariableStatement assignIterator = new AssignVariableStatement(_iteratorName, iterator);
+        declareIterator.getInstructions(stack, collector);
+        assignIterator.getInstructions(stack, collector);
 
         Label nextLoop = new Label();
         collector.add(new LabelInstruction(nextLoop));
 
         Label endLoop = new Label();
 
+        new LoadVariableExpression(_iteratorName).getInstructions(stack, collector);
         Expression hasNext = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), HAS_NEXT_METHOD);
         new ExpressionCondition(hasNext).jumpWhenFalse(endLoop).getInstructions(stack, collector);
 
+        Expression next = new InvokeVirtualExpression(new NothingExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
+
         new DeclareVariableStatement(new ParameterisedClassImpl(Object.class), _valueName).getInstructions(stack, collector);
-        Expression next = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
         new AssignVariableStatement(_valueName, next).getInstructions(stack, collector);
 
         Block block2 = stack.pushBlock(nextLoop, endLoop);
