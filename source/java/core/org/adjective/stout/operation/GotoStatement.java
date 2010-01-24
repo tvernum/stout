@@ -28,11 +28,11 @@ import org.adjective.stout.instruction.JumpInstruction;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class GotoOperation extends SmartOperation implements Operation
+public class GotoStatement extends SmartStatement implements Operation
 {
     private final Label _label;
 
-    public GotoOperation(Label label)
+    public GotoStatement(Label label)
     {
         _label = label;
     }

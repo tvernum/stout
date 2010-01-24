@@ -17,29 +17,26 @@
 
 package org.adjective.stout.operation;
 
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Label;
 
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.instruction.GenericInstruction;
+import org.adjective.stout.instruction.LabelInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class PopExpression extends SmartExpression implements Expression
+public class LabelStatement extends SmartStatement
 {
-    public static final GenericInstruction INSTRUCTION = new GenericInstruction(Opcodes.POP);
-    public static final PopExpression INSTANCE = new PopExpression();
+    private LabelInstruction _instruction;
 
-    public UnresolvedType getExpressionType(ExecutionStack stack)
+    public LabelStatement(Label label)
     {
-        return UnknownType.INSTANCE;
+        _instruction = new LabelInstruction(label);
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(INSTRUCTION);
+        collector.add(_instruction);
     }
-
 }

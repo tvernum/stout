@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.objectweb.asm.Label;
+
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ConstructorSignature;
 import org.adjective.stout.core.ElementModifier;
@@ -194,6 +196,16 @@ public class StatementOperations
     public TryCatchSpec attempt(Statement body)
     {
         return new TryCatchSpec(body);
+    }
+
+    public ElementBuilder<Statement> callStatic(UnresolvedType targetClass, MethodSignature method, Expression... arguments)
+    {
+        return new InvokeStaticStatement(targetClass, method, arguments);
+    }
+
+    public ElementBuilder<Statement> Goto(Label label)
+    {
+        return new GotoStatement(label);
     }
 
 }

@@ -53,7 +53,7 @@ public class IfElseSpec implements ElementBuilder<IfElse>
         return whenTrue(StatementOperations.toStatementArray(body));
     }
 
-    public IfElseSpec whenTrue(Statement[] body)
+    public IfElseSpec whenTrue(Statement... body)
     {
         _true = body;
         return this;

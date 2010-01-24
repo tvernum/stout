@@ -21,7 +21,7 @@ import org.objectweb.asm.Label;
 
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.operation.EmptyStatement;
-import org.adjective.stout.operation.GotoOperation;
+import org.adjective.stout.operation.GotoStatement;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -35,8 +35,8 @@ public class AlwaysCondition extends SmartCondition implements Condition, Elemen
         return new EmptyStatement();
     }
 
-    public GotoOperation jumpWhenTrue(Label label)
+    public GotoStatement jumpWhenTrue(Label label)
     {
-        return new GotoOperation(label);
+        return new GotoStatement(label);
     }
 }

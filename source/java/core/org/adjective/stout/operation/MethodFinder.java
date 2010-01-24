@@ -37,9 +37,14 @@ public class MethodFinder
 
     public MethodSignature find(Class< ? > declaring, String name, Class< ? >... parameterTypes)
     {
+        return findMethod(declaring, declaring, name, parameterTypes);
+    }
+
+    private MethodSignature findMethod(Class< ? > declaring, Class< ? > search, String name, Class< ? >... parameterTypes)
+    {
         try
         {
-            Method method = declaring.getDeclaredMethod(name, parameterTypes);
+            Method method = search.getDeclaredMethod(name, parameterTypes);
             return new MethodSignatureImpl(method);
         }
         catch (RuntimeException e)
@@ -48,18 +53,18 @@ public class MethodFinder
         }
         catch (NoSuchMethodException e)
         {
-            if (declaring == Object.class)
+            if (search == Object.class)
             {
                 throw new OperationException("Cannot find method " + name + " in " + declaring, e);
             }
             else
             {
-                return find(declaring.getSuperclass(), name, parameterTypes);
+                return findMethod(declaring, search.getSuperclass(), name, parameterTypes);
             }
         }
         catch (Exception e)
         {
-            throw new OperationException("Cannot find method " + name + " in " + declaring, e);
+            throw new OperationException("Cannot find method " + name + " in " + search, e);
         }
     }
 
