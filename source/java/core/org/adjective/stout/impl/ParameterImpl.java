@@ -17,6 +17,8 @@
 
 package org.adjective.stout.impl;
 
+import java.util.Arrays;
+
 import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.Parameter;
 import org.adjective.stout.core.UnresolvedType;
@@ -52,4 +54,8 @@ public class ParameterImpl implements Parameter
         return _type;
     }
 
+    public String toString()
+    {
+        return Arrays.toString(_annotations) + ' ' + _type + ' ' + _name;
+    }
 }

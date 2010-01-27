@@ -599,7 +599,7 @@ class StackVisualiserMethodVisitor extends AbstractVisitor implements MethodVisi
                 }
             }
         }
-        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected: " + Arrays.toString(allowed));
+        error("Incorrect type '" + stackType + "' (at item " + stackItem + ") Expected one of: " + Arrays.toString(allowed));
     }
 
     @SuppressWarnings("unchecked")

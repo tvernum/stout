@@ -43,6 +43,8 @@ import org.adjective.stout.core.ParameterisedClass;
 import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.core.AnnotationDescriptor.Attribute;
 import org.adjective.stout.core.ExecutionStack.Block;
+import org.adjective.stout.exception.StoutException;
+import org.adjective.stout.exception.WriterException;
 import org.adjective.stout.instruction.AbstractInstructionCollector;
 import org.adjective.stout.operation.CodeStack;
 import org.adjective.stout.operation.Variable;
@@ -185,7 +187,14 @@ public class ByteCodeWriter
                 instruction.accept(mv);
             }
         };
-        method.getBody().getInstructions(stack, collector);
+        try
+        {
+            method.getBody().getInstructions(stack, collector);
+        }
+        catch (StoutException e)
+        {
+            throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method.getName(), e);
+        }
         stack.popBlock(block);
         stack.declareVariableInfo();
 

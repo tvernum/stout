@@ -200,7 +200,7 @@
     </target>
 
     <target name="jar.build">
-        <copy todir="${output.class.core.dir}/biz/squint/" file="${source.version.properties}" />
+        <copy todir="${output.class.core.dir}/org/adjective/stout/" file="${source.version.properties}" />
         <jar destfile="${output.jar.core.file}">
             <fileset dir="${output.class.core.dir}" />
         </jar>
