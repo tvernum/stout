@@ -20,17 +20,23 @@ package org.adjective.stout.operation;
 import org.adjective.stout.builder.ElementBuilder;
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class EmptyExpression extends SmartStatement implements ElementBuilder<Statement>
+public class EmptyExpression extends SmartExpression implements ElementBuilder<Expression>
 {
-    public static final EmptyExpression INSTANCE = new EmptyExpression();
+    public static final Expression INSTANCE = new EmptyExpression();
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         // Do nothing
+    }
+
+    public UnresolvedType getExpressionType(ExecutionStack stack)
+    {
+        return UnknownType.INSTANCE;
     }
 
 }

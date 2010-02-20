@@ -39,7 +39,7 @@ public class ContinueStatement extends SmartStatement
             Label label = block.continueLabel();
             if (label != null)
             {
-                collector.add(new JumpInstruction(Opcodes.GOTO, label));
+                addInstruction(collector,new JumpInstruction(Opcodes.GOTO, label));
                 return;
             }
         }

@@ -23,17 +23,12 @@ import org.adjective.stout.core.Operation;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public abstract class SmartStatement implements ElementBuilder<Statement>, Statement
+public abstract class SmartStatement extends AbstractOperation implements ElementBuilder<Statement>, Statement
 {
     protected static final Operation[] NO_CHILDREN = new Operation[0];
 
     public Statement create()
     {
         return this;
-    }
-    
-    public int getResultingStackSize()
-    {
-        return 0;
     }
 }

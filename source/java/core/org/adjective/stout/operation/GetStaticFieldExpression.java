@@ -42,7 +42,7 @@ public class GetStaticFieldExpression extends SmartExpression
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new FieldInstruction(Opcodes.GETSTATIC, _from.getInternalName(), _name, _type.getDescriptor()));
+        addInstruction(collector,new FieldInstruction(Opcodes.GETSTATIC, _from.getInternalName(), _name, _type.getDescriptor()));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

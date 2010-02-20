@@ -39,7 +39,7 @@ public class PopExpression extends SmartExpression implements Expression
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(INSTRUCTION);
+        addInstruction(collector,INSTRUCTION);
     }
 
 }

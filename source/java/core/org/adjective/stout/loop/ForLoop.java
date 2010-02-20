@@ -52,7 +52,7 @@ public class ForLoop extends SmartStatement
         _initialiser.getInstructions(stack, collector);
 
         Label startLoop = new Label();
-        collector.add(new LabelInstruction(startLoop));
+        addInstruction(collector,new LabelInstruction(startLoop));
 
         Label endLoop = new Label();
         _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
@@ -66,11 +66,11 @@ public class ForLoop extends SmartStatement
         }
         stack.popBlock(block2);
 
-        collector.add(new LabelInstruction(nextLoop));
+        addInstruction(collector,new LabelInstruction(nextLoop));
         _increment.getInstructions(stack, collector);
-        collector.add(new JumpInstruction(Opcodes.GOTO, startLoop));
+        addInstruction(collector,new JumpInstruction(Opcodes.GOTO, startLoop));
         
-        collector.add(new LabelInstruction(endLoop));
+        addInstruction(collector,new LabelInstruction(endLoop));
         stack.popBlock(block1);
     }
 

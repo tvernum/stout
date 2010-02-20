@@ -17,44 +17,34 @@
 
 package org.adjective.stout.operation;
 
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-
 import org.adjective.stout.core.ExecutionStack;
 import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.exception.OperationException;
-import org.adjective.stout.instruction.VarInstruction;
-import org.adjective.stout.operation.VariableResolver.StackVariable;
+import org.adjective.stout.core.UnresolvedType;
+import org.adjective.stout.instruction.EmptyInstruction;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class AssignVariableStatement extends SmartStatement
+public class LineNumberExpression implements Expression
 {
-    private final String _name;
     private final Expression _expression;
+    private final int _line;
 
-    public AssignVariableStatement(String name, Expression expression)
+    public LineNumberExpression(Expression expression, int line)
     {
-        _name = name;
         _expression = expression;
+        _line = line;
+    }
+
+    public UnresolvedType getExpressionType(ExecutionStack stack)
+    {
+        return _expression.getExpressionType(stack);
     }
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        StackVariable var = new VariableResolver(stack).findVariable(_name);
-        if (var == null)
-        {
-            throw new OperationException("No such variable " + _name + " on stack");
-        }
-        getInstructions(stack, var, collector);
+        collector.add(EmptyInstruction.INSTANCE, _line);
+        _expression.getInstructions(stack, collector);
     }
 
-    private void getInstructions(ExecutionStack stack, StackVariable var, InstructionCollector collector)
-    {
-        _expression.getInstructions(stack, collector);
-        String descriptor = var.variable.type().getDescriptor();
-        int opcode = Type.getType(descriptor).getOpcode(Opcodes.ISTORE);
-        addInstruction(collector,new VarInstruction(opcode, var.index));
-    }
 }

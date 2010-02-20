@@ -47,7 +47,7 @@ public class WhileLoop extends SmartStatement
         Block block1 = stack.pushBlock();
 
         Label nextLoop = new Label();
-        collector.add(new LabelInstruction(nextLoop));
+        addInstruction(collector,new LabelInstruction(nextLoop));
         Label endLoop = new Label();
         _condition.jumpWhenFalse(endLoop).getInstructions(stack, collector);
 
@@ -58,8 +58,8 @@ public class WhileLoop extends SmartStatement
         }
         stack.popBlock(block2);
 
-        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
-        collector.add(new LabelInstruction(endLoop));
+        addInstruction(collector,new JumpInstruction(Opcodes.GOTO, nextLoop));
+        addInstruction(collector,new LabelInstruction(endLoop));
         stack.popBlock(block1);
     }
 

@@ -65,13 +65,13 @@ public class AssignFieldStatement extends SmartStatement implements ElementBuild
 
         if (_target == null)
         {
-            collector.add(ThisExpression.LOAD_THIS);
+            addInstruction(collector,ThisExpression.LOAD_THIS);
         }
         else
         {
             _target.getInstructions(stack, collector);
         }
         _expression.getInstructions(stack, collector);
-        collector.add(new FieldInstruction(Opcodes.PUTFIELD, owner.getInternalName(), _fieldName, type.getDescriptor()));
+        addInstruction(collector,new FieldInstruction(Opcodes.PUTFIELD, owner.getInternalName(), _fieldName, type.getDescriptor()));
     }
 }

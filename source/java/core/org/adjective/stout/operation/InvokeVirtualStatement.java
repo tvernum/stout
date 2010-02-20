@@ -48,7 +48,7 @@ public class InvokeVirtualStatement extends SmartStatement implements ElementBui
         _operation.getInstructions(stack, collector);
         if (_operation.hasReturnValue())
         {
-            collector.add(new GenericInstruction(Opcodes.POP));
+            addInstruction(collector,new GenericInstruction(Opcodes.POP));
         }
     }
 

@@ -25,7 +25,7 @@ import org.adjective.stout.core.Operation;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public abstract class SmartOperation implements ElementBuilder<Operation>, Operation
+public abstract class SmartOperation extends AbstractOperation implements ElementBuilder<Operation>, Operation
 {
     public Operation create()
     {

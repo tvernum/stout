@@ -60,8 +60,8 @@ public class IfElse extends SmartStatement
 
         if (_whenFalse != null)
         {
-            collector.add(new JumpInstruction(Opcodes.GOTO, endLabel));
-            collector.add(new LabelInstruction(elseLabel));
+            addInstruction(collector,new JumpInstruction(Opcodes.GOTO, endLabel));
+            addInstruction(collector,new LabelInstruction(elseLabel));
 
             for (Statement stmt : _whenFalse)
             {
@@ -69,7 +69,7 @@ public class IfElse extends SmartStatement
             }
         }
         
-        collector.add(new LabelInstruction(endLabel));
+        addInstruction(collector,new LabelInstruction(endLabel));
 
         stack.popBlock(block);
     }

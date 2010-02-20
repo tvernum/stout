@@ -46,7 +46,7 @@ public class DoWhileLoop extends SmartStatement
 
         Label startLoop = new Label();
 
-        collector.add(new LabelInstruction(startLoop));
+        addInstruction(collector,new LabelInstruction(startLoop));
 
         Label nextLoop = new Label();
         Label endLoop = new Label();
@@ -57,9 +57,9 @@ public class DoWhileLoop extends SmartStatement
         }
         stack.popBlock(block2);
 
-        collector.add(new LabelInstruction(nextLoop));
+        addInstruction(collector,new LabelInstruction(nextLoop));
         _condition.jumpWhenTrue(startLoop).getInstructions(stack, collector);
-        collector.add(new LabelInstruction(endLoop));
+        addInstruction(collector,new LabelInstruction(endLoop));
 
         stack.popBlock(block1);
     }

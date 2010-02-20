@@ -32,7 +32,7 @@ public class NullExpression extends SmartExpression implements ElementBuilder<Ex
 {
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new GenericInstruction(Opcodes.ACONST_NULL));
+        addInstruction(collector,new GenericInstruction(Opcodes.ACONST_NULL));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

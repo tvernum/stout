@@ -62,24 +62,24 @@ public class TryCatch extends SmartStatement
         for (int i = 0; i < handlers.length; i++)
         {
             handlers[i] = new Label();
-            collector.add(new TryCatchInstruction(start, end, _catches[i]._type, handlers[i]));
+            addInstruction(collector,new TryCatchInstruction(start, end, _catches[i]._type, handlers[i]));
         }
 
-        collector.add(new LabelInstruction(start));
+        addInstruction(collector,new LabelInstruction(start));
         _body.getInstructions(stack, collector);
-        collector.add(new LabelInstruction(end));
+        addInstruction(collector,new LabelInstruction(end));
 
         Label done = new Label();
-        collector.add(new JumpInstruction(Opcodes.GOTO, done));
+        addInstruction(collector,new JumpInstruction(Opcodes.GOTO, done));
 
         for (int i = 0; i < handlers.length; i++)
         {
-            collector.add(new LabelInstruction(handlers[i]));
+            addInstruction(collector,new LabelInstruction(handlers[i]));
             _catches[i]._code.getInstructions(stack, collector);
-            collector.add(new JumpInstruction(Opcodes.GOTO, done));
+            addInstruction(collector,new JumpInstruction(Opcodes.GOTO, done));
         }
 
-        collector.add(new LabelInstruction(done));
+        addInstruction(collector,new LabelInstruction(done));
     }
 
 }

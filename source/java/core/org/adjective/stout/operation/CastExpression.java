@@ -46,6 +46,6 @@ public class CastExpression extends SmartExpression implements Expression
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         _expression.getInstructions(stack, collector);
-        collector.add(new TypeInstruction(Opcodes.CHECKCAST, _type));
+        addInstruction(collector,new TypeInstruction(Opcodes.CHECKCAST, _type));
     }
 }

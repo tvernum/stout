@@ -39,5 +39,10 @@ public class DuplicateStackExpression implements Expression
     {
         collector.add(new GenericInstruction(Opcodes.DUP));
     }
+    
+    public int getLineNumber()
+    {
+        return 0;
+    }
 
 }

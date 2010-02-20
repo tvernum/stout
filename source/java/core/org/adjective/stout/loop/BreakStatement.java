@@ -40,13 +40,13 @@ public class BreakStatement extends SmartStatement
             Label label = block.breakLabel();
             if (label != null)
             {
-                collector.add(new JumpInstruction(Opcodes.GOTO, label));
+                addInstruction(collector, new JumpInstruction(Opcodes.GOTO, label));
                 return;
             }
         }
         throw new OperationException("No label to break to");
     }
-    
+
     public Operation[] getChildren()
     {
         return NO_CHILDREN;

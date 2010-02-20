@@ -20,28 +20,23 @@ package org.adjective.stout.instruction;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.Instruction;
-import org.adjective.stout.core.InstructionCollector;
 import org.adjective.stout.core.MethodSignature;
 import org.adjective.stout.core.UnresolvedType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class MethodInstruction implements Instruction
+public class MethodInstruction extends AbstractInstruction
 {
-    private final int _opCode;
     private final String _declaringType;
     private final String _name;
     private final String _descriptor;
 
     public MethodInstruction(int opCode, String declaringType, MethodSignature method)
     {
-        _opCode = opCode;
+        super(opCode);
         _declaringType = declaringType;
         _name = method.getName();
-
         _descriptor = getMethodDescriptor(method.getReturnType().getRawClass(), method.getParameterTypes());
     }
 
@@ -54,7 +49,7 @@ public class MethodInstruction implements Instruction
 
     public MethodInstruction(int opCode, String declaringType, String name, String descriptor)
     {
-        _opCode = opCode;
+        super(opCode);
         _declaringType = declaringType;
         _name = name;
         _descriptor = descriptor;
@@ -62,7 +57,7 @@ public class MethodInstruction implements Instruction
 
     public void accept(MethodVisitor visitor)
     {
-        visitor.visitMethodInsn(_opCode, _declaringType, _name, _descriptor);
+        visitor.visitMethodInsn(getOpCode(), _declaringType, _name, _descriptor);
     }
 
     private static Type[] getArgumentTypes(UnresolvedType[] parameterTypes)
@@ -74,15 +69,4 @@ public class MethodInstruction implements Instruction
         }
         return argumentTypes;
     }
-
-    public int getOpCode()
-    {
-        return _opCode;
-    }
-
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
-    {
-        collector.add(this);
-    }
-
 }

@@ -42,7 +42,7 @@ public class ConstantValueExpression<T> extends SmartExpression implements Eleme
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new LoadConstantInstruction(_value));
+        addInstruction(collector,new LoadConstantInstruction(_value));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

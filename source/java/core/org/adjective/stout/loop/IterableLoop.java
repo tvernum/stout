@@ -33,10 +33,10 @@ import org.adjective.stout.instruction.LabelInstruction;
 import org.adjective.stout.operation.AssignVariableStatement;
 import org.adjective.stout.operation.DeclareVariableStatement;
 import org.adjective.stout.operation.DuplicateStackExpression;
+import org.adjective.stout.operation.EmptyExpression;
 import org.adjective.stout.operation.Expression;
 import org.adjective.stout.operation.InvokeVirtualExpression;
 import org.adjective.stout.operation.LoadVariableExpression;
-import org.adjective.stout.operation.NothingExpression;
 import org.adjective.stout.operation.SmartStatement;
 import org.adjective.stout.operation.Statement;
 import org.adjective.stout.operation.VM;
@@ -75,7 +75,7 @@ public class IterableLoop extends SmartStatement
         assignIterator.getInstructions(stack, collector);
 
         Label nextLoop = new Label();
-        collector.add(new LabelInstruction(nextLoop));
+        addInstruction(collector,new LabelInstruction(nextLoop));
 
         Label endLoop = new Label();
 
@@ -83,7 +83,7 @@ public class IterableLoop extends SmartStatement
         Expression hasNext = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), HAS_NEXT_METHOD);
         new ExpressionCondition(hasNext).jumpWhenFalse(endLoop).getInstructions(stack, collector);
 
-        Expression next = new InvokeVirtualExpression(new NothingExpression(), new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
+        Expression next = new InvokeVirtualExpression(EmptyExpression.INSTANCE, new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
 
         new DeclareVariableStatement(new ParameterisedClassImpl(Object.class), _valueName).getInstructions(stack, collector);
         new AssignVariableStatement(_valueName, next).getInstructions(stack, collector);
@@ -95,9 +95,9 @@ public class IterableLoop extends SmartStatement
         }
         stack.popBlock(block2);
 
-        collector.add(new JumpInstruction(Opcodes.GOTO, nextLoop));
-        collector.add(new LabelInstruction(endLoop));
-        collector.add(new GenericInstruction(Opcodes.POP));
+        addInstruction(collector,new JumpInstruction(Opcodes.GOTO, nextLoop));
+        addInstruction(collector,new LabelInstruction(endLoop));
+        addInstruction(collector,new GenericInstruction(Opcodes.POP));
         stack.popBlock(block1);
     }
 

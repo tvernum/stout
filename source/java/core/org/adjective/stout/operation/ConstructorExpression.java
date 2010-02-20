@@ -51,14 +51,14 @@ public class ConstructorExpression extends SmartExpression implements ElementBui
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new TypeInstruction(Opcodes.NEW, _constructor.getType().getInternalName()));
-        collector.add(new GenericInstruction(Opcodes.DUP));
+        addInstruction(collector,new TypeInstruction(Opcodes.NEW, _constructor.getType().getInternalName()));
+        addInstruction(collector,new GenericInstruction(Opcodes.DUP));
         for (Expression expression : _expressions)
         {
             expression.getInstructions(stack, collector);
         }
         String descriptor = MethodInstruction.getMethodDescriptor(Void.TYPE, _constructor.getParameterTypes());
-        collector.add(new MethodInstruction(Opcodes.INVOKESPECIAL, _constructor.getType().getInternalName(), "<init>", descriptor));
+        addInstruction(collector,new MethodInstruction(Opcodes.INVOKESPECIAL, _constructor.getType().getInternalName(), "<init>", descriptor));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

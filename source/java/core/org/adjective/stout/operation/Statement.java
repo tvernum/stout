@@ -25,5 +25,5 @@ import org.adjective.stout.core.Operation;
  */
 public interface Statement extends Operation
 {
-    // Marker interface only
+    // Marker interface
 }

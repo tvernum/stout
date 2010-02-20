@@ -19,37 +19,22 @@ package org.adjective.stout.instruction;
 
 import org.objectweb.asm.MethodVisitor;
 
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.Instruction;
-import org.adjective.stout.core.InstructionCollector;
-
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class VarInstruction implements Instruction
+public class VarInstruction extends AbstractInstruction
 {
-    private final int _opCode;
     private final int _var;
 
     public VarInstruction(int opCode, int var)
     {
-        _opCode = opCode;
+        super(opCode);
         _var = var;
-    }
-
-    public int getOpCode()
-    {
-        return _opCode;
-    }
-
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
-    {
-        collector.add(this);
     }
 
     public void accept(MethodVisitor visitor)
     {
-        visitor.visitVarInsn(_opCode, _var);
+        visitor.visitVarInsn(getOpCode(), _var);
     }
 
 }

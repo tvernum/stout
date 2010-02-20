@@ -39,7 +39,7 @@ public class GotoStatement extends SmartStatement implements Operation
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new JumpInstruction(Opcodes.GOTO, _label));
+        addInstruction(collector,new JumpInstruction(Opcodes.GOTO, _label));
     }
 
 }

@@ -15,25 +15,25 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.operation;
+package org.adjective.stout.instruction;
 
-import org.adjective.stout.core.ExecutionStack;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.UnresolvedType;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public class NothingExpression extends SmartExpression implements Expression
+public class EmptyInstruction extends AbstractInstruction
 {
-    public UnresolvedType getExpressionType(ExecutionStack stack)
+    public static final EmptyInstruction INSTANCE = new EmptyInstruction();
+    
+    public EmptyInstruction()
     {
-        return UnknownType.INSTANCE;
+        super(Opcodes.NOP);
     }
 
-    public void getInstructions(ExecutionStack stack, InstructionCollector collector)
+    public void accept(MethodVisitor visitor)
     {
-        // Do nothing
+        // Nothing
     }
-
 }

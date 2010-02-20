@@ -54,6 +54,7 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     private final String _package;
     private final String _name;
+    private String _source;
     private UnresolvedType _outerClass;
     private final Set<ElementModifier> _modifiers;
     private final List<TypeParameter> _parameters;
@@ -85,10 +86,10 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         {
             addDefaultConstructor();
         }
-        return new ClassImpl(_modifiers, _package, _name, _outerClass, toArray(_parameters, TypeParameter.class), // 
-                _superClass, toArray(_interfaces, ParameterisedClass.class), //
-                toArray(_annotations, AnnotationDescriptor.class), toArray(_innerClasses, ClassDescriptor.class), //
-                toArray(_fields, FieldDescriptor.class), toArray(_methods, MethodDescriptor.class));
+        return new ClassImpl(_modifiers, _package, _name, _source, _outerClass, // 
+                toArray(_parameters, TypeParameter.class), _superClass, //
+                toArray(_interfaces, ParameterisedClass.class), toArray(_annotations, AnnotationDescriptor.class), //
+                toArray(_innerClasses, ClassDescriptor.class), toArray(_fields, FieldDescriptor.class), toArray(_methods, MethodDescriptor.class));
     }
 
     private void addDefaultConstructor()
@@ -119,6 +120,12 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
     public ClassSpec withTypeParameter(ElementBuilder< ? extends TypeParameter> parameter)
     {
         return withTypeParameter(parameter.create());
+    }
+
+    public ClassSpec withSourceCode(String source)
+    {
+        _source = source;
+        return this;
     }
 
     public ClassSpec withTypeParameters(TypeParameter... parameters)

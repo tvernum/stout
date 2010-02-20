@@ -25,6 +25,11 @@ import org.adjective.stout.core.InstructionCollector;
  */
 public abstract class AbstractInstructionCollector implements InstructionCollector
 {
+    public void add(Instruction instruction)
+    {
+        add(instruction, 0);
+    }
+
     public void add(Iterable<Instruction> instructions)
     {
         for (Instruction instruction : instructions)

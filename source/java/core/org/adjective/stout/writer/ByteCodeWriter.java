@@ -24,6 +24,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -83,6 +84,11 @@ public class ByteCodeWriter
         String signature = null; // @TODO
         cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers()), cls.getInternalName(), signature, getInternalName(cls.getSuperClass()),
                 getInterfaceNames(cls));
+
+        if (cls.getSourceFile() != null)
+        {
+            cv.visitSource(cls.getSourceFile(), "");
+        }
 
         UnresolvedType outer = cls.getOuterClass();
         if (outer != null)
@@ -145,8 +151,7 @@ public class ByteCodeWriter
         }
 
         String signature = null; // @TODO
-        final MethodVisitor mv = cv.visitMethod(getModifierCode(method.getModifiers()), method.getName(), getMethodDescriptor(method), signature,
-                exceptions);
+        final MethodVisitor mv = visitMethod(cv, method, exceptions, signature);
 
         for (AnnotationDescriptor annotation : method.getAnnotations())
         {
@@ -182,8 +187,17 @@ public class ByteCodeWriter
 
         InstructionCollector collector = new AbstractInstructionCollector()
         {
-            public void add(Instruction instruction)
+            private int _line;
+
+            public void add(Instruction instruction, int line)
             {
+                if (line != 0 && line != _line)
+                {
+                    _line = line;
+                    Label label = new Label();
+                    mv.visitLabel(label);
+                    mv.visitLineNumber(line, label);
+                }
                 instruction.accept(mv);
             }
         };
@@ -200,6 +214,11 @@ public class ByteCodeWriter
 
         mv.visitMaxs(0, 0);
         mv.visitEnd();
+    }
+
+    protected MethodVisitor visitMethod(ClassVisitor cv, MethodDescriptor method, String[] exceptions, String signature)
+    {
+        return cv.visitMethod(getModifierCode(method.getModifiers()), method.getName(), getMethodDescriptor(method), signature, exceptions);
     }
 
     private void processAnnotation(AnnotationDescriptor annotation, AnnotationVisitor av)

@@ -37,6 +37,6 @@ public class LabelStatement extends SmartStatement
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(_instruction);
+        addInstruction(collector,_instruction);
     }
 }

@@ -22,15 +22,11 @@ import org.adjective.stout.builder.ElementBuilder;
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public abstract class SmartExpression implements Expression, ElementBuilder<Expression>
+public abstract class SmartExpression extends AbstractOperation implements Expression, ElementBuilder<Expression>
 {
     public Expression create()
     {
         return this;
     }
-    
-    public int getResultingStackSize()
-    {
-        return 1;
-    }
+
 }

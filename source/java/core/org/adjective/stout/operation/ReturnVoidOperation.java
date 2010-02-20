@@ -31,7 +31,7 @@ public class ReturnVoidOperation extends SmartStatement implements ElementBuilde
 {
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new GenericInstruction(Opcodes.RETURN));
+        addInstruction(collector,new GenericInstruction(Opcodes.RETURN));
     }
 
 }

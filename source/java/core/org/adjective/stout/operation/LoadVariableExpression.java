@@ -51,7 +51,7 @@ public class LoadVariableExpression extends SmartExpression implements ElementBu
         StackVariable variable = getVariable(stack);
         String descriptor = variable.variable.type().getDescriptor();
         int opcode = Type.getType(descriptor).getOpcode(Opcodes.ILOAD);
-        collector.add(new VarInstruction(opcode, variable.index));
+        addInstruction(collector,new VarInstruction(opcode, variable.index));
     }
 
     private StackVariable getVariable(ExecutionStack stack)

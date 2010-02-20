@@ -39,7 +39,7 @@ public class IgnoreValueStatement extends SmartStatement implements ElementBuild
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
         _expression.getInstructions(stack, collector);
-        collector.add(new GenericInstruction(Opcodes.POP));
+        addInstruction(collector,new GenericInstruction(Opcodes.POP));
     }
 
 }

@@ -15,31 +15,24 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.core;
+package org.adjective.stout.operation;
 
-import java.util.Set;
+import org.adjective.stout.core.Instruction;
+import org.adjective.stout.core.InstructionCollector;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public interface ClassDescriptor extends UnresolvedType
+public class AbstractOperation
 {
-    public String getPackage();
-    public String getName();
-    public String getInternalName();
+    protected void addInstruction(InstructionCollector collector, Instruction instruction)
+    {
+        collector.add(instruction, getLineNumber());
+    }
 
-    public String getSourceFile();
+    protected int getLineNumber()
+    {
+        return 0;
+    }
 
-    public UnresolvedType getOuterClass();
-    public ClassDescriptor[] getInnerClasses();
-
-    public Set<ElementModifier> getModifiers();
-    public TypeParameter[] getParameters();
-    public AnnotationDescriptor[] getAnnotations();
-
-    public ParameterisedClass getSuperClass();
-    public ParameterisedClass[] getInterfaces();
-
-    public FieldDescriptor[] getFields();
-    public MethodDescriptor[] getMethods();
 }

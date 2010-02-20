@@ -58,9 +58,9 @@ public class ConditionalExpression extends SmartExpression implements Expression
         Operation condition = _condition.jumpWhenFalse(falseLabel);
         condition.getInstructions(stack, collector);
         _whenTrue.getInstructions(stack, collector);
-        collector.add(new JumpInstruction(Opcodes.GOTO, endLabel));
-        collector.add(new LabelInstruction(falseLabel));
+        addInstruction(collector, new JumpInstruction(Opcodes.GOTO, endLabel));
+        addInstruction(collector, new LabelInstruction(falseLabel));
         _whenFalse.getInstructions(stack, collector);
-        collector.add(new LabelInstruction(endLabel));
+        addInstruction(collector, new LabelInstruction(endLabel));
     }
 }

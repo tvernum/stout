@@ -47,7 +47,7 @@ public class ConstantIntegerExpression extends SmartExpression implements Elemen
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(getInstruction(_value));
+        addInstruction(collector, getInstruction(_value));
     }
 
     public static Instruction getInstruction(int value)

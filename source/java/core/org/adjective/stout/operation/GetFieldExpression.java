@@ -56,6 +56,6 @@ public class GetFieldExpression extends SmartExpression implements Expression
     {
         _target.getInstructions(stack, collector);
         String from = (_from == null ? stack.currentClass().getInternalName() : _from.getInternalName());
-        collector.add(new FieldInstruction(Opcodes.GETFIELD, from, _name, _type.getDescriptor()));
+        addInstruction(collector, new FieldInstruction(Opcodes.GETFIELD, from, _name, _type.getDescriptor()));
     }
 }

@@ -48,7 +48,7 @@ public class ReturnObjectStatement extends SmartStatement implements ElementBuil
     {
         checkReturnType(stack);
         _object.getInstructions(stack, collector);
-        collector.add(new GenericInstruction(Opcodes.ARETURN));
+        addInstruction(collector,new GenericInstruction(Opcodes.ARETURN));
     }
 
     private void checkReturnType(ExecutionStack stack)

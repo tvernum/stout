@@ -58,7 +58,7 @@ public class InvokeSuperConstructorStatement extends SmartStatement implements E
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        collector.add(new VarInstruction(Opcodes.ALOAD, 0));
+        addInstruction(collector,new VarInstruction(Opcodes.ALOAD, 0));
         for (int i = 0; i < _arguments.length; i++)
         {
             Expression expr = _arguments[i];

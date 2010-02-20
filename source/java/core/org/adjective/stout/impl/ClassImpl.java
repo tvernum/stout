@@ -45,13 +45,16 @@ public class ClassImpl implements ClassDescriptor
     private final ClassDescriptor[] _innerClasses;
     private final FieldDescriptor[] _fields;
     private final MethodDescriptor[] _methods;
+    private final String _source;
 
-    public ClassImpl(Set<ElementModifier> modifiers, String pkg, String name, UnresolvedType outerClass, TypeParameter[] parameters, ParameterisedClass superClass,
-            ParameterisedClass[] interfaces, AnnotationDescriptor[] annotations, ClassDescriptor[] innerClasses, FieldDescriptor[] fields, MethodDescriptor[] methods)
+    public ClassImpl(Set<ElementModifier> modifiers, String pkg, String name, String source, UnresolvedType outerClass, TypeParameter[] parameters,
+            ParameterisedClass superClass, ParameterisedClass[] interfaces, AnnotationDescriptor[] annotations, ClassDescriptor[] innerClasses,
+            FieldDescriptor[] fields, MethodDescriptor[] methods)
     {
         _modifiers = modifiers;
         _package = pkg;
         _name = name;
+        _source = source;
         _outerClass = outerClass;
         _parameters = parameters;
         _superClass = superClass;
@@ -158,14 +161,19 @@ public class ClassImpl implements ClassDescriptor
     {
         return _innerClasses;
     }
-    
+
     public UnresolvedType getOuterClass()
     {
         return _outerClass;
     }
-    
+
     public String toString()
     {
         return _name;
+    }
+
+    public String getSourceFile()
+    {
+        return _source;
     }
 }

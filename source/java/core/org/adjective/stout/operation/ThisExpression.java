@@ -42,7 +42,7 @@ public class ThisExpression extends SmartExpression
         {
             throw new OperationException("Cannot access 'this' inside a static method");
         }
-        collector.add(LOAD_THIS);
+        addInstruction(collector,LOAD_THIS);
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)

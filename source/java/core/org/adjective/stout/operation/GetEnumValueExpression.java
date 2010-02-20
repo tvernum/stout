@@ -42,7 +42,7 @@ public class GetEnumValueExpression extends SmartExpression
     {
         String enumName = Type.getInternalName(_value.getClass());
         String enumDescriptor = Type.getDescriptor(_value.getClass());
-        collector.add(new FieldInstruction(Opcodes.GETSTATIC, enumName, _value.name(), enumDescriptor));
+        addInstruction(collector,new FieldInstruction(Opcodes.GETSTATIC, enumName, _value.name(), enumDescriptor));
     }
 
     public UnresolvedType getExpressionType(ExecutionStack stack)
