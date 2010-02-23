@@ -70,6 +70,7 @@ public class ByteCodeWriter
 
     public byte[] write(ClassDescriptor cls)
     {
+        begin(cls);
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         ClassVisitor cv = writer;
         if (_trace)
@@ -119,7 +120,19 @@ public class ByteCodeWriter
         }
 
         cv.visitEnd();
+
+        end(cls);
         return writer.toByteArray();
+    }
+
+    protected void begin(@SuppressWarnings("unused") ClassDescriptor cls)
+    {
+        // Override in sub-classes
+    }
+
+    protected void end(@SuppressWarnings("unused") ClassDescriptor cls)
+    {
+        // Override in sub-classes
     }
 
     private void writeAnnotation(ClassVisitor cv, AnnotationDescriptor annotation)
@@ -177,7 +190,7 @@ public class ByteCodeWriter
         Block block = stack.pushBlock();
         if (!isStatic(method))
         {
-            block.declareVariable(new Variable("this", cls));
+            block.declareVariable(new Variable("#this", cls));
         }
 
         for (Parameter parameter : parameters)

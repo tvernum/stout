@@ -23,15 +23,12 @@ public interface MethodDescriptor extends ClassMember, MethodSignature
 {
     public String getName();
 
-    public ExtendedType getReturnType();
-
     public Set<ElementModifier> getModifiers();
-
+    public ExtendedType getReturnType();
     public Parameter[] getParameters();
 
     public AnnotationDescriptor[] getAnnotations();
+    public ExtendedType[] getExceptions();
 
     public Code getBody();
-
-    public ExtendedType[] getExceptions();
 }
