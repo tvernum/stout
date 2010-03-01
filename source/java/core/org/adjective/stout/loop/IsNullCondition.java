@@ -15,31 +15,36 @@
  * ------------------------------------------------------------------------
  */
 
-package org.adjective.stout.core;
+package org.adjective.stout.loop;
 
-import java.util.Set;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+
+import org.adjective.stout.builder.ElementBuilder;
+import org.adjective.stout.core.Operation;
+import org.adjective.stout.operation.Expression;
+import org.adjective.stout.operation.JumpOperation;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public interface ClassDescriptor extends UnresolvedType
+public class IsNullCondition extends SmartCondition implements ElementBuilder<Condition>
 {
-    public String getPackage();
-    public String getName();
-    public String getInternalName();
+    private final Expression _expression;
 
-    public String getSourceFile();
+    public IsNullCondition(Expression expression)
+    {
+        _expression = expression;
+    }
 
-    public UnresolvedType getOuterClass();
-    public ClassDescriptor[] getInnerClasses();
+    public Operation jumpWhenFalse(Label label)
+    {
+        return new JumpOperation(Opcodes.IFNONNULL, _expression, label);
+    }
 
-    public Set<ElementModifier> getModifiers();
-    public TypeParameter[] getParameters();
-    public AnnotationDescriptor[] getAnnotations();
+    public Operation jumpWhenTrue(Label label)
+    {
+        return new JumpOperation(Opcodes.IFNULL, _expression, label);
+    }
 
-    public ParameterisedClass getSuperClass();
-    public UnresolvedType[] getInterfaces();
-
-    public FieldDescriptor[] getFields();
-    public MethodDescriptor[] getMethods();
 }

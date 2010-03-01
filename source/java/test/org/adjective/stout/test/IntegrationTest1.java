@@ -68,7 +68,7 @@ public class IntegrationTest1
 
         String methodName = "foo";
         ClassDescriptor cls =
-        /*    */new ClassSpec(packageName, className)
+        /*    */ClassSpec.newClass(packageName, className)
         /*      */.withModifiers(ElementModifier.PUBLIC)
         /*      */.withSuperClass(BaseClass.class)
         /*      */.withDefaultConstructor(ElementModifier.PUBLIC)
@@ -137,7 +137,7 @@ public class IntegrationTest1
 
         String methodName = "foo";
         ClassDescriptor cls =
-        /*    */new ClassSpec(packageName, className)
+        /*    */ClassSpec.newClass(packageName, className)
         /*      */.withModifiers(ElementModifier.PUBLIC)
         /*      */.withSuperClass(BaseClass.class)
         /*      */.withDefaultConstructor(ElementModifier.PUBLIC)

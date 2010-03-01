@@ -87,6 +87,11 @@ public class StatementOperations
         return new AssignFieldStatement(null, null, name.toString(), null, expression);
     }
 
+    public ElementBuilder<Statement> assignField(CharSequence name, ElementBuilder< ? extends Expression> expression)
+    {
+        return assignField(name, expression.create());
+    }
+
     public ElementBuilder<Statement> assignVariable(CharSequence name, ElementBuilder< ? extends Expression> expression)
     {
         return assignVariable(name, expression.create());

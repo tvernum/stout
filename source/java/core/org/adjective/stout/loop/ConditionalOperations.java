@@ -81,4 +81,9 @@ public class ConditionalOperations
         return new ConditionalExpression(condition, whenTrue, whenFalse);
     }
 
+    public Condition isNull(Expression expr)
+    {
+        return new IsNullCondition(expr);
+    }
+
 }

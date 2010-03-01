@@ -85,7 +85,7 @@ public class MethodImpl implements MethodDescriptor
 
     public UnresolvedType[] getParameterTypes()
     {
-        UnresolvedType[] types = new ExtendedType[_parameters.length];
+        UnresolvedType[] types = new UnresolvedType[_parameters.length];
         for (int i = 0; i < types.length; i++)
         {
             types[i] = _parameters[i].getType();

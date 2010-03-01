@@ -17,29 +17,50 @@
 
 package org.adjective.stout.core;
 
-import java.util.Set;
+import org.adjective.stout.operation.UnknownType;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
  */
-public interface ClassDescriptor extends UnresolvedType
+public class SimpleType implements UnresolvedType
 {
-    public String getPackage();
-    public String getName();
-    public String getInternalName();
+    private final Sort _sort;
+    private final String _name;
 
-    public String getSourceFile();
+    public SimpleType(Sort sort, String pkg, String name)
+    {
+        this(sort, pkg + "." + name);
+    }
 
-    public UnresolvedType getOuterClass();
-    public ClassDescriptor[] getInnerClasses();
+    public SimpleType(Sort sort, String fqName)
+    {
+        _sort = sort;
+        _name = fqName;
+    }
 
-    public Set<ElementModifier> getModifiers();
-    public TypeParameter[] getParameters();
-    public AnnotationDescriptor[] getAnnotations();
+    public boolean canAssignTo(UnresolvedType type)
+    {
+        return type.getInternalName().equals(this.getInternalName());
+    }
 
-    public ParameterisedClass getSuperClass();
-    public UnresolvedType[] getInterfaces();
+    public String getInternalName()
+    {
+        return _name.replace('.', '/');
+    }
 
-    public FieldDescriptor[] getFields();
-    public MethodDescriptor[] getMethods();
+    public String getDescriptor()
+    {
+        return "L" + getInternalName() + ";";
+    }
+
+    public UnresolvedType getFieldType(String fieldName)
+    {
+        return UnknownType.INSTANCE;
+    }
+
+    public Sort getSort()
+    {
+        return _sort;
+    }
+
 }

@@ -33,17 +33,18 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
+import org.adjective.stout.core.Code;
 import org.adjective.stout.core.ElementModifier;
-import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.Instruction;
 import org.adjective.stout.core.InstructionCollector;
+import org.adjective.stout.core.MemberType;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.Parameter;
-import org.adjective.stout.core.ParameterisedClass;
 import org.adjective.stout.core.UnresolvedType;
 import org.adjective.stout.core.AnnotationDescriptor.Attribute;
 import org.adjective.stout.core.ExecutionStack.Block;
+import org.adjective.stout.core.UnresolvedType.Sort;
 import org.adjective.stout.exception.StoutException;
 import org.adjective.stout.exception.WriterException;
 import org.adjective.stout.instruction.AbstractInstructionCollector;
@@ -71,7 +72,7 @@ public class ByteCodeWriter
     public byte[] write(ClassDescriptor cls)
     {
         begin(cls);
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        ClassWriter writer = createClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         ClassVisitor cv = writer;
         if (_trace)
         {
@@ -83,8 +84,8 @@ public class ByteCodeWriter
         }
 
         String signature = null; // @TODO
-        cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers()), cls.getInternalName(), signature, getInternalName(cls.getSuperClass()),
-                getInterfaceNames(cls));
+        cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers(), cls.getSort()), cls.getInternalName(), signature,
+                getInternalName(cls.getSuperClass()), getInterfaceNames(cls));
 
         if (cls.getSourceFile() != null)
         {
@@ -106,7 +107,7 @@ public class ByteCodeWriter
         {
             String name = inner.getInternalName();
             String simpleName = name.substring(name.lastIndexOf('/') + 1);
-            cv.visitInnerClass(name, cls.getInternalName(), simpleName, getModifierCode(inner.getModifiers()));
+            cv.visitInnerClass(name, cls.getInternalName(), simpleName, getModifierCode(inner.getModifiers(), inner.getSort()));
         }
 
         for (FieldDescriptor field : cls.getFields())
@@ -123,6 +124,11 @@ public class ByteCodeWriter
 
         end(cls);
         return writer.toByteArray();
+    }
+
+    protected ClassWriter createClassWriter(int flags)
+    {
+        return new ClassWriter(flags);
     }
 
     protected void begin(@SuppressWarnings("unused") ClassDescriptor cls)
@@ -144,7 +150,8 @@ public class ByteCodeWriter
     private void writeField(ClassVisitor cv, FieldDescriptor field)
     {
         String signature = null;// @TODO
-        FieldVisitor fv = cv.visitField(getModifierCode(field.getModifiers()), field.getName(), field.getType().getDescriptor(), signature, null);
+        FieldVisitor fv = cv.visitField(getModifierCode(field.getModifiers(), MemberType.FIELD), field.getName(), field.getType().getDescriptor(),
+                signature, null);
 
         for (AnnotationDescriptor annotation : field.getAnnotations())
         {
@@ -214,13 +221,28 @@ public class ByteCodeWriter
                 instruction.accept(mv);
             }
         };
-        try
+        Code body = method.getBody();
+        if (method.getModifiers().contains(ElementModifier.ABSTRACT))
         {
-            method.getBody().getInstructions(stack, collector);
+            if (body != null)
+            {
+                throw new IllegalStateException("The abstract method " + method + " cannot have a body");
+            }
         }
-        catch (StoutException e)
+        else
         {
-            throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method.getName(), e);
+            if (body == null)
+            {
+                throw new IllegalStateException("The method " + method + " is not abstract, but does not have a body");
+            }
+            try
+            {
+                body.getInstructions(stack, collector);
+            }
+            catch (StoutException e)
+            {
+                throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method.getName(), e);
+            }
         }
         stack.popBlock(block);
         stack.declareVariableInfo();
@@ -231,7 +253,8 @@ public class ByteCodeWriter
 
     protected MethodVisitor visitMethod(ClassVisitor cv, MethodDescriptor method, String[] exceptions, String signature)
     {
-        return cv.visitMethod(getModifierCode(method.getModifiers()), method.getName(), getMethodDescriptor(method), signature, exceptions);
+        return cv.visitMethod(getModifierCode(method.getModifiers(), MemberType.METHOD), method.getName(), getMethodDescriptor(method), signature,
+                exceptions);
     }
 
     private void processAnnotation(AnnotationDescriptor annotation, AnnotationVisitor av)
@@ -292,7 +315,7 @@ public class ByteCodeWriter
 
     private String[] getInterfaceNames(ClassDescriptor cls)
     {
-        ParameterisedClass[] interfaces = cls.getInterfaces();
+        UnresolvedType[] interfaces = cls.getInterfaces();
         String[] interfaceNames = new String[interfaces.length];
         for (int i = 0; i < interfaceNames.length; i++)
         {
@@ -301,7 +324,7 @@ public class ByteCodeWriter
         return interfaceNames;
     }
 
-    private String getInternalName(ExtendedType cls)
+    private String getInternalName(UnresolvedType cls)
     {
         if (cls == null)
         {
@@ -309,13 +332,13 @@ public class ByteCodeWriter
         }
         else
         {
-            return Type.getInternalName(cls.getRawClass());
+            return cls.getInternalName();
         }
     }
 
-    private int getModifierCode(Set<ElementModifier> modifiers)
+    private int getModifierCode(Set<ElementModifier> modifiers, Sort sort)
     {
-        int code = 0;
+        int code = (sort == Sort.INTERFACE ? Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT : 0);
         for (ElementModifier modifier : modifiers)
         {
             code |= modifier.getCode();
@@ -323,4 +346,31 @@ public class ByteCodeWriter
         return code;
     }
 
+    private int getModifierCode(Set<ElementModifier> modifiers, MemberType type)
+    {
+        int code = getModifierCode(modifiers, (Sort) null);
+        int illegal = Opcodes.ACC_ANNOTATION | Opcodes.ACC_BRIDGE | Opcodes.ACC_ENUM | Opcodes.ACC_INTERFACE | Opcodes.ACC_SUPER;
+        switch (type)
+        {
+            case FIELD:
+                illegal |= Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE | Opcodes.ACC_STRICT | Opcodes.ACC_SYNCHRONIZED;
+                break;
+            case METHOD:
+                if (isBitSet(Opcodes.ACC_ABSTRACT, code))
+                {
+                    illegal |= Opcodes.ACC_NATIVE | Opcodes.ACC_STRICT | Opcodes.ACC_SYNCHRONIZED | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL;
+                }
+                break;
+        }
+        if (isBitSet(illegal, code))
+        {
+            throw new IllegalStateException("Illegal combination of modifier codes: " + code + " (illegal codes: " + illegal + ")");
+        }
+        return code;
+    }
+
+    private boolean isBitSet(int bit, int code)
+    {
+        return (code & bit) != 0;
+    }
 }

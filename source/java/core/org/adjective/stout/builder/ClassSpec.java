@@ -29,7 +29,6 @@ import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.Code;
 import org.adjective.stout.core.ElementModifier;
-import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.Operation;
@@ -50,8 +49,18 @@ import static org.adjective.stout.util.CollectionUtils.toArray;
  */
 public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedType
 {
+    private static final List<ElementModifier> ALLOWED_INTERFACE_MODIFIERS = Arrays.asList( //
+            ElementModifier.PUBLIC, ElementModifier.ABSTRACT, ElementModifier.INTERFACE);
+
+    private static final List<ElementModifier> REQUIRED_INTERFACE_FIELD_MODIFIERS = Arrays.asList( //
+            ElementModifier.PUBLIC, ElementModifier.STATIC, ElementModifier.FINAL);
+
+    private static final List<ElementModifier> REQUIRED_INTERFACE_METHOD_MODIFIERS = Arrays.asList( //
+            ElementModifier.PUBLIC, ElementModifier.ABSTRACT);
+
     public static final String CONSTRUCTOR_NAME = "<init>";
 
+    private final Sort _sort;
     private final String _package;
     private final String _name;
     private String _source;
@@ -59,25 +68,36 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
     private final Set<ElementModifier> _modifiers;
     private final List<TypeParameter> _parameters;
     private ParameterisedClass _superClass;
-    private final List<ParameterisedClass> _interfaces;
+    private final List<UnresolvedType> _interfaces;
     private final List<AnnotationDescriptor> _annotations;
     private final List<ClassDescriptor> _innerClasses;
     private final List<FieldDescriptor> _fields;
     private final List<MethodDescriptor> _methods;
     private ElementModifier _defaultConstructorAccess;
 
-    public ClassSpec(String pkg, String name)
+    private ClassSpec(Sort sort, String pkg, String name)
     {
+        _sort = sort;
         _package = pkg;
         _name = name;
         _modifiers = new HashSet<ElementModifier>();
         _parameters = new ArrayList<TypeParameter>();
-        _interfaces = new ArrayList<ParameterisedClass>();
+        _interfaces = new ArrayList<UnresolvedType>();
         _annotations = new ArrayList<AnnotationDescriptor>();
         _innerClasses = new ArrayList<ClassDescriptor>();
         _fields = new ArrayList<FieldDescriptor>();
         _methods = new ArrayList<MethodDescriptor>();
         _defaultConstructorAccess = null;
+    }
+
+    public static ClassSpec newClass(String pkg, String name)
+    {
+        return new ClassSpec(Sort.CLASS, pkg, name);
+    }
+
+    public static ClassSpec newInterface(String pkg, String name)
+    {
+        return new ClassSpec(Sort.INTERFACE, pkg, name);
     }
 
     public ClassDescriptor create()
@@ -86,9 +106,15 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         {
             addDefaultConstructor();
         }
-        return new ClassImpl(_modifiers, _package, _name, _source, _outerClass, // 
-                toArray(_parameters, TypeParameter.class), _superClass, //
-                toArray(_interfaces, ParameterisedClass.class), toArray(_annotations, AnnotationDescriptor.class), //
+        if(isInterface()) {
+         return ClassImpl
+         .newInterface(_modifiers, _package, _name, _source, _outerClass, toArray(_parameters, TypeParameter.class), //
+                 toArray(_interfaces, UnresolvedType.class), toArray(_annotations, AnnotationDescriptor.class), //
+                 toArray(_innerClasses, ClassDescriptor.class), toArray(_fields, FieldDescriptor.class), toArray(_methods, MethodDescriptor.class));
+        }
+        return ClassImpl
+        .newClass(_modifiers, _package, _name, _source, _outerClass, toArray(_parameters, TypeParameter.class), _superClass, //
+                toArray(_interfaces, UnresolvedType.class), toArray(_annotations, AnnotationDescriptor.class), //
                 toArray(_innerClasses, ClassDescriptor.class), toArray(_fields, FieldDescriptor.class), toArray(_methods, MethodDescriptor.class));
     }
 
@@ -107,6 +133,16 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public ClassSpec withModifiers(ElementModifier... modifiers)
     {
+        if (isInterface())
+        {
+            for (ElementModifier modifier : modifiers)
+            {
+                if (!ALLOWED_INTERFACE_MODIFIERS.contains(modifier))
+                {
+                    throw new IllegalArgumentException("The interface " + _name + " cannot have modifier " + modifier);
+                }
+            }
+        }
         _modifiers.addAll(Arrays.asList(modifiers));
         return this;
     }
@@ -145,6 +181,10 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public ClassSpec withSuperClass(ParameterisedClass superClass)
     {
+        if (isInterface())
+        {
+            throw new IllegalArgumentException("The interface " + _name + " cannot have a superclass (" + superClass + ")");
+        }
         _superClass = superClass;
         return this;
     }
@@ -212,6 +252,17 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public ClassSpec withField(FieldDescriptor field)
     {
+        if (isInterface())
+        {
+            Set<ElementModifier> modifiers = field.getModifiers();
+            for (ElementModifier required : REQUIRED_INTERFACE_FIELD_MODIFIERS)
+            {
+                if (!modifiers.contains(required))
+                {
+                    throw new IllegalArgumentException("All fields in an interface (" + _name + ") must be " + required);
+                }
+            }
+        }
         _fields.add(field);
         return this;
     }
@@ -223,6 +274,17 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public ClassSpec withMethod(MethodDescriptor method)
     {
+        if (isInterface())
+        {
+            Set<ElementModifier> modifiers = method.getModifiers();
+            for (ElementModifier required : REQUIRED_INTERFACE_METHOD_MODIFIERS)
+            {
+                if (!modifiers.contains(required))
+                {
+                    throw new IllegalArgumentException("All methods in an interface (" + _name + ") must be " + required);
+                }
+            }
+        }
         _methods.add(method);
         return this;
     }
@@ -232,9 +294,23 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         return withMethod(method.create());
     }
 
-    public ClassSpec withMethods(MethodDescriptor... method)
+    public ClassSpec withMethods(MethodDescriptor... methods)
     {
-        _methods.addAll(Arrays.asList(method));
+        if (isInterface())
+        {
+            for (MethodDescriptor method : methods)
+            {
+                Set<ElementModifier> modifiers = method.getModifiers();
+                for (ElementModifier required : REQUIRED_INTERFACE_METHOD_MODIFIERS)
+                {
+                    if (!modifiers.contains(required))
+                    {
+                        throw new IllegalArgumentException("All methods in an interface (" + _name + ") must be " + required);
+                    }
+                }
+            }
+        }
+        _methods.addAll(Arrays.asList(methods));
         return this;
     }
 
@@ -293,7 +369,12 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public Sort getSort()
     {
-        return Sort.CLASS;
+        return _sort;
+    }
+
+    private boolean isInterface()
+    {
+        return _sort == Sort.INTERFACE;
     }
 
     public boolean canAssignTo(UnresolvedType type)
@@ -308,7 +389,7 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
         }
         if (_interfaces != null)
         {
-            for (ExtendedType ifc : _interfaces)
+            for (UnresolvedType ifc : _interfaces)
             {
                 if (ifc.canAssignTo(type))
                 {
@@ -342,14 +423,32 @@ public class ClassSpec implements ElementBuilder<ClassDescriptor>, UnresolvedTyp
 
     public ClassSpec withInnerClasses(ClassDescriptor... inner)
     {
+        if (isInterface())
+        {
+            throw new UnsupportedOperationException("Cannot have an inner class in interface " + _name);
+        }
         _innerClasses.addAll(Arrays.asList(inner));
         return this;
     }
 
     public ClassSpec withInnerClass(ClassDescriptor inner)
     {
+        if (isInterface())
+        {
+            throw new UnsupportedOperationException("Cannot have an inner class in interface " + _name);
+        }
         _innerClasses.add(inner);
         return this;
+    }
+
+    public List<MethodDescriptor> getMethods()
+    {
+        return _methods;
+    }
+
+    public void withInterface(ClassDescriptor descriptor)
+    {
+        _interfaces.add(descriptor);
     }
 
 }

@@ -22,7 +22,6 @@ import java.util.Set;
 import org.adjective.stout.core.AnnotationDescriptor;
 import org.adjective.stout.core.ClassDescriptor;
 import org.adjective.stout.core.ElementModifier;
-import org.adjective.stout.core.ExtendedType;
 import org.adjective.stout.core.FieldDescriptor;
 import org.adjective.stout.core.MethodDescriptor;
 import org.adjective.stout.core.ParameterisedClass;
@@ -34,23 +33,25 @@ import org.adjective.stout.core.UnresolvedType;
  */
 public class ClassImpl implements ClassDescriptor
 {
+    private final Sort _sort;
     private final Set<ElementModifier> _modifiers;
     private final String _package;
     private final String _name;
     private final UnresolvedType _outerClass;
     private final TypeParameter[] _parameters;
     private final ParameterisedClass _superClass;
-    private final ParameterisedClass[] _interfaces;
+    private final UnresolvedType[] _interfaces;
     private final AnnotationDescriptor[] _annotations;
     private final ClassDescriptor[] _innerClasses;
     private final FieldDescriptor[] _fields;
     private final MethodDescriptor[] _methods;
     private final String _source;
 
-    public ClassImpl(Set<ElementModifier> modifiers, String pkg, String name, String source, UnresolvedType outerClass, TypeParameter[] parameters,
-            ParameterisedClass superClass, ParameterisedClass[] interfaces, AnnotationDescriptor[] annotations, ClassDescriptor[] innerClasses,
-            FieldDescriptor[] fields, MethodDescriptor[] methods)
+    private ClassImpl(Sort sort, Set<ElementModifier> modifiers, String pkg, String name, String source, UnresolvedType outerClass,
+            TypeParameter[] parameters, ParameterisedClass superClass, UnresolvedType[] interfaces, AnnotationDescriptor[] annotations,
+            ClassDescriptor[] innerClasses, FieldDescriptor[] fields, MethodDescriptor[] methods)
     {
+        _sort = sort;
         _modifiers = modifiers;
         _package = pkg;
         _name = name;
@@ -63,6 +64,22 @@ public class ClassImpl implements ClassDescriptor
         _innerClasses = innerClasses;
         _fields = fields;
         _methods = methods;
+    }
+
+    public static ClassImpl newClass(Set<ElementModifier> modifiers, String pkg, String name, String source, UnresolvedType outerClass,
+            TypeParameter[] parameters, ParameterisedClass superClass, UnresolvedType[] interfaces, AnnotationDescriptor[] annotations,
+            ClassDescriptor[] innerClasses, FieldDescriptor[] fields, MethodDescriptor[] methods)
+    {
+        return new ClassImpl(Sort.CLASS, modifiers, pkg, name, source, outerClass, parameters, superClass, interfaces, annotations, innerClasses,
+                fields, methods);
+    }
+
+    public static ClassImpl newInterface(Set<ElementModifier> modifiers, String pkg, String name, String source, UnresolvedType outerClass,
+            TypeParameter[] parameters, UnresolvedType[] interfaces, AnnotationDescriptor[] annotations, ClassDescriptor[] innerClasses,
+            FieldDescriptor[] fields, MethodDescriptor[] methods)
+    {
+        return new ClassImpl(Sort.INTERFACE, modifiers, pkg, name, source, outerClass, parameters, null, interfaces, annotations, innerClasses,
+                fields, methods);
     }
 
     public Set<ElementModifier> getModifiers()
@@ -90,7 +107,7 @@ public class ClassImpl implements ClassDescriptor
         return _superClass;
     }
 
-    public ParameterisedClass[] getInterfaces()
+    public UnresolvedType[] getInterfaces()
     {
         return _interfaces;
     }
@@ -117,7 +134,7 @@ public class ClassImpl implements ClassDescriptor
 
     public Sort getSort()
     {
-        return Sort.CLASS;
+        return _sort;
     }
 
     public boolean canAssignTo(UnresolvedType type)
@@ -130,7 +147,7 @@ public class ClassImpl implements ClassDescriptor
         {
             return true;
         }
-        for (ExtendedType ifc : _interfaces)
+        for (UnresolvedType ifc : _interfaces)
         {
             if (ifc.canAssignTo(type))
             {

@@ -77,11 +77,12 @@ public class IterableLoop extends SmartStatement
         Label nextLoop = new Label();
         addInstruction(collector,new LabelInstruction(nextLoop));
 
+        Label popLoop = new Label();
         Label endLoop = new Label();
 
         new LoadVariableExpression(_iteratorName).getInstructions(stack, collector);
         Expression hasNext = new InvokeVirtualExpression(new DuplicateStackExpression(), new ParameterisedClassImpl(Iterator.class), HAS_NEXT_METHOD);
-        new ExpressionCondition(hasNext).jumpWhenFalse(endLoop).getInstructions(stack, collector);
+        new ExpressionCondition(hasNext).jumpWhenFalse(popLoop).getInstructions(stack, collector);
 
         Expression next = new InvokeVirtualExpression(EmptyExpression.INSTANCE, new ParameterisedClassImpl(Iterator.class), GET_NEXT_METHOD);
 
@@ -96,8 +97,9 @@ public class IterableLoop extends SmartStatement
         stack.popBlock(block2);
 
         addInstruction(collector,new JumpInstruction(Opcodes.GOTO, nextLoop));
-        addInstruction(collector,new LabelInstruction(endLoop));
+        addInstruction(collector,new LabelInstruction(popLoop));
         addInstruction(collector,new GenericInstruction(Opcodes.POP));
+        addInstruction(collector,new LabelInstruction(endLoop));
         stack.popBlock(block1);
     }
 
