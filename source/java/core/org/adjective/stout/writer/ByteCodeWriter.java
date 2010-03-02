@@ -149,7 +149,7 @@ public class ByteCodeWriter
 
     private void writeField(ClassVisitor cv, FieldDescriptor field)
     {
-        String signature = null;// @TODO
+        String signature = null; // @TODO
         FieldVisitor fv = cv.visitField(getModifierCode(field.getModifiers(), MemberType.FIELD), field.getName(), field.getType().getDescriptor(),
                 signature, null);
 
@@ -191,36 +191,6 @@ public class ByteCodeWriter
             }
         }
 
-        mv.visitCode();
-
-        CodeStack stack = new CodeStack(cls, method, mv);
-        Block block = stack.pushBlock();
-        if (!isStatic(method))
-        {
-            block.declareVariable(new Variable("#this", cls));
-        }
-
-        for (Parameter parameter : parameters)
-        {
-            block.declareVariable(new Variable(parameter.getName(), parameter.getType()));
-        }
-
-        InstructionCollector collector = new AbstractInstructionCollector()
-        {
-            private int _line;
-
-            public void add(Instruction instruction, int line)
-            {
-                if (line != 0 && line != _line)
-                {
-                    _line = line;
-                    Label label = new Label();
-                    mv.visitLabel(label);
-                    mv.visitLineNumber(line, label);
-                }
-                instruction.accept(mv);
-            }
-        };
         Code body = method.getBody();
         if (method.getModifiers().contains(ElementModifier.ABSTRACT))
         {
@@ -235,6 +205,36 @@ public class ByteCodeWriter
             {
                 throw new IllegalStateException("The method " + method + " is not abstract, but does not have a body");
             }
+            mv.visitCode();
+
+            CodeStack stack = new CodeStack(cls, method, mv);
+            Block block = stack.pushBlock();
+            if (!isStatic(method))
+            {
+                block.declareVariable(new Variable("#this", cls));
+            }
+
+            for (Parameter parameter : parameters)
+            {
+                block.declareVariable(new Variable(parameter.getName(), parameter.getType()));
+            }
+
+            InstructionCollector collector = new AbstractInstructionCollector()
+            {
+                private int _line;
+
+                public void add(Instruction instruction, int line)
+                {
+                    if (line != 0 && line != _line)
+                    {
+                        _line = line;
+                        Label label = new Label();
+                        mv.visitLabel(label);
+                        mv.visitLineNumber(line, label);
+                    }
+                    instruction.accept(mv);
+                }
+            };
             try
             {
                 body.getInstructions(stack, collector);
@@ -243,9 +243,9 @@ public class ByteCodeWriter
             {
                 throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method.getName(), e);
             }
+            stack.popBlock(block);
+            stack.declareVariableInfo();
         }
-        stack.popBlock(block);
-        stack.declareVariableInfo();
 
         mv.visitMaxs(0, 0);
         mv.visitEnd();
