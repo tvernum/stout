@@ -35,6 +35,7 @@ import org.adjective.stout.instruction.TypeInstruction;
  */
 public class CreateArrayExpression extends SmartExpression
 {
+    private static final GenericInstruction DUPLICATE = new GenericInstruction(Opcodes.DUP);
     private final ExtendedType _componentType;
     private final Expression[] _elements;
 
@@ -51,33 +52,32 @@ public class CreateArrayExpression extends SmartExpression
 
     public void getInstructions(ExecutionStack stack, InstructionCollector collector)
     {
-        addInstruction(collector,ConstantIntegerExpression.getInstruction(_elements.length));
-        
+        addInstruction(collector, ConstantIntegerExpression.getInstruction(_elements.length));
+
         Instruction store;
         Class< ? > componentClass = _componentType.getRawClass();
         if (componentClass.isPrimitive())
         {
-            addInstruction(collector,new IntInstruction(Opcodes.NEWARRAY, getTypeCode(componentClass)));
+            addInstruction(collector, new IntInstruction(Opcodes.NEWARRAY, getTypeCode(componentClass)));
             store = new GenericInstruction(Type.getType(componentClass).getOpcode(Opcodes.IASTORE));
         }
         else
         {
-            addInstruction(collector,new TypeInstruction(Opcodes.ANEWARRAY, _componentType.getInternalName()));
+            addInstruction(collector, new TypeInstruction(Opcodes.ANEWARRAY, _componentType.getInternalName()));
             store = new GenericInstruction(Opcodes.AASTORE);
         }
-        
-        GenericInstruction dup = new GenericInstruction(Opcodes.DUP);
+
         for (int i = 0; i < _elements.length; i++)
         {
-            addInstruction(collector,dup);
-            addInstruction(collector,ConstantIntegerExpression.getInstruction(i));
+            addInstruction(collector, DUPLICATE);
+            addInstruction(collector, ConstantIntegerExpression.getInstruction(i));
             _elements[i].getInstructions(stack, collector);
-            addInstruction(collector,store);
+            addInstruction(collector, store);
         }
-        
+
     }
 
-    private int getTypeCode(Class< ? > type)
+    public static int getTypeCode(Class< ? > type)
     {
         if (type == Character.TYPE)
         {

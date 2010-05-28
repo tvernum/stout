@@ -56,7 +56,7 @@ public class IterableLoopSpec implements ElementBuilder<IterableLoop>
         return withBody(StatementOperations.toStatementArray(body));
     }
 
-    public IterableLoopSpec withBody(Statement[] body)
+    public IterableLoopSpec withBody(Statement... body)
     {
         _body = body;
         return this;

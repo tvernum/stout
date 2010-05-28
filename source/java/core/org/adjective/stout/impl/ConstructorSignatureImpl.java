@@ -49,4 +49,25 @@ public class ConstructorSignatureImpl implements ConstructorSignature
         return _type;
     }
 
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(_type);
+        if (_parameterTypes.length == 0)
+        {
+            builder.append("( )");
+        }
+        else
+        {
+            builder.append('(');
+            for (UnresolvedType arg : _parameterTypes)
+            {
+                builder.append(arg);
+                builder.append(',');
+            }
+            builder.setCharAt(builder.length() - 1, ')');
+        }
+        return builder.toString();
+    }
+
 }
