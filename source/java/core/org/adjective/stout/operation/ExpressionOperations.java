@@ -178,7 +178,7 @@ public class ExpressionOperations
         return new ChainExpression(expression, statements);
     }
 
-    public Expression chain(List<ElementBuilder<? extends Statement>> statements, Expression expression)
+    public Expression chain(List<ElementBuilder< ? extends Statement>> statements, Expression expression)
     {
         return new ChainExpression(StatementOperations.toStatementArray(statements), expression);
     }
@@ -196,6 +196,11 @@ public class ExpressionOperations
     public Expression cast(UnresolvedType type, Expression expression)
     {
         return new CastExpression(type, expression);
+    }
+
+    public Expression cast(Class< ? > type, Expression expression)
+    {
+        return cast(new ParameterisedClassImpl(type), expression);
     }
 
     public Expression pop()

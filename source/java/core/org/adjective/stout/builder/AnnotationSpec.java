@@ -77,6 +77,10 @@ public class AnnotationSpec implements ElementBuilder<AnnotationDescriptor>
         {
             value = getDefaultValue(name);
         }
+        else
+        {
+            verifyAttributeExists(name);
+        }
         _attributes.add(new AttributeImpl(name, value));
         return this;
     }
@@ -85,16 +89,29 @@ public class AnnotationSpec implements ElementBuilder<AnnotationDescriptor>
     {
         try
         {
-            Method method = _type.getMethod(name);
+            Method method = getMethod(name);
             return method.getDefaultValue();
         }
         catch (RuntimeException e)
         {
             throw e;
         }
-        catch (Exception e)
+    }
+
+    private void verifyAttributeExists(String name)
+    {
+        getMethod(name);
+    }
+
+    private Method getMethod(String name)
+    {
+        try
         {
-            throw new BuilderException("Cannot determine default value for attribute " + name + " in " + _type);
+            return _type.getMethod(name);
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new BuilderException("The annotation " + _type + " does have an attribute '" + name + "'");
         }
     }
 
@@ -102,6 +119,26 @@ public class AnnotationSpec implements ElementBuilder<AnnotationDescriptor>
     {
         _runtime = runtime;
         return this;
+    }
+
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(getClass().getSimpleName());
+        builder.append("{ type:");
+        builder.append(_type);
+        builder.append("; runtime:");
+        builder.append(_runtime);
+        builder.append("; attributes:[");
+        for (AnnotationDescriptor.Attribute attribute : this._attributes)
+        {
+            builder.append(attribute.getName());
+            builder.append('=');
+            builder.append(attribute.getValue());
+            builder.append(',');
+        }
+        builder.append("]}");
+        return builder.toString();
     }
 
 }
