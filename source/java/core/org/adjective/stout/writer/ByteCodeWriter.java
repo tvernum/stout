@@ -17,9 +17,16 @@
 
 package org.adjective.stout.writer;
 
-import java.io.PrintWriter;
-import java.util.Set;
-
+import org.adjective.stout.builder.AnnotationSpec;
+import org.adjective.stout.core.*;
+import org.adjective.stout.core.AnnotationDescriptor.Attribute;
+import org.adjective.stout.core.ExecutionStack.Block;
+import org.adjective.stout.core.UnresolvedType.Sort;
+import org.adjective.stout.exception.StoutException;
+import org.adjective.stout.exception.WriterException;
+import org.adjective.stout.instruction.AbstractInstructionCollector;
+import org.adjective.stout.operation.CodeStack;
+import org.adjective.stout.operation.Variable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -31,25 +38,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import org.adjective.stout.core.AnnotationDescriptor;
-import org.adjective.stout.core.ClassDescriptor;
-import org.adjective.stout.core.Code;
-import org.adjective.stout.core.ElementModifier;
-import org.adjective.stout.core.FieldDescriptor;
-import org.adjective.stout.core.Instruction;
-import org.adjective.stout.core.InstructionCollector;
-import org.adjective.stout.core.MemberType;
-import org.adjective.stout.core.MethodDescriptor;
-import org.adjective.stout.core.Parameter;
-import org.adjective.stout.core.UnresolvedType;
-import org.adjective.stout.core.AnnotationDescriptor.Attribute;
-import org.adjective.stout.core.ExecutionStack.Block;
-import org.adjective.stout.core.UnresolvedType.Sort;
-import org.adjective.stout.exception.StoutException;
-import org.adjective.stout.exception.WriterException;
-import org.adjective.stout.instruction.AbstractInstructionCollector;
-import org.adjective.stout.operation.CodeStack;
-import org.adjective.stout.operation.Variable;
+import java.io.PrintWriter;
+import java.util.Set;
 
 /**
  * @author <a href="http://blog.adjective.org/">Tim Vernum</a>
@@ -85,7 +75,7 @@ public class ByteCodeWriter
 
         String signature = null; // @TODO
         cv.visit(Opcodes.V1_5, getModifierCode(cls.getModifiers(), cls.getSort()), cls.getInternalName(), signature,
-                getInternalName(cls.getSuperClass()), getInterfaceNames(cls));
+                 getInternalName(cls.getSuperClass()), getInterfaceNames(cls));
 
         if (cls.getSourceFile() != null)
         {
@@ -107,7 +97,10 @@ public class ByteCodeWriter
         {
             String name = inner.getInternalName();
             String simpleName = name.substring(name.lastIndexOf('/') + 1);
-            cv.visitInnerClass(name, cls.getInternalName(), simpleName, getModifierCode(inner.getModifiers(), inner.getSort()));
+            cv.visitInnerClass(name,
+                               cls.getInternalName(),
+                               simpleName,
+                               getModifierCode(inner.getModifiers(), inner.getSort()));
         }
 
         for (FieldDescriptor field : cls.getFields())
@@ -150,8 +143,11 @@ public class ByteCodeWriter
     private void writeField(ClassVisitor cv, FieldDescriptor field)
     {
         String signature = null; // @TODO
-        FieldVisitor fv = cv.visitField(getModifierCode(field.getModifiers(), MemberType.FIELD), field.getName(), field.getType().getDescriptor(),
-                signature, null);
+        FieldVisitor fv = cv.visitField(getModifierCode(field.getModifiers(), MemberType.FIELD),
+                                        field.getName(),
+                                        field.getType().getDescriptor(),
+                                        signature,
+                                        null);
 
         for (AnnotationDescriptor annotation : field.getAnnotations())
         {
@@ -186,7 +182,9 @@ public class ByteCodeWriter
             AnnotationDescriptor[] annotations = parameter.getAnnotations();
             for (AnnotationDescriptor annotation : annotations)
             {
-                AnnotationVisitor av = mv.visitParameterAnnotation(i, Type.getDescriptor(annotation.getType()), annotation.isRuntime());
+                AnnotationVisitor av = mv.visitParameterAnnotation(i,
+                                                                   Type.getDescriptor(annotation.getType()),
+                                                                   annotation.isRuntime());
                 processAnnotation(annotation, av);
             }
         }
@@ -241,7 +239,8 @@ public class ByteCodeWriter
             }
             catch (StoutException e)
             {
-                throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method.getName(), e);
+                throw new WriterException("In class " + cls.getPackage() + "." + cls.getName() + ", cannot write method " + method
+                        .getName(), e);
             }
             stack.popBlock(block);
             stack.declareVariableInfo();
@@ -253,8 +252,11 @@ public class ByteCodeWriter
 
     protected MethodVisitor visitMethod(ClassVisitor cv, MethodDescriptor method, String[] exceptions, String signature)
     {
-        return cv.visitMethod(getModifierCode(method.getModifiers(), MemberType.METHOD), method.getName(), getMethodDescriptor(method), signature,
-                exceptions);
+        return cv.visitMethod(getModifierCode(method.getModifiers(), MemberType.METHOD),
+                              method.getName(),
+                              getMethodDescriptor(method),
+                              signature,
+                              exceptions);
     }
 
     private void processAnnotation(AnnotationDescriptor annotation, AnnotationVisitor av)
@@ -269,31 +271,82 @@ public class ByteCodeWriter
     private void processAttribute(AnnotationVisitor av, Attribute attribute)
     {
         Object value = attribute.getValue();
-        Class< ? > valueType = value.getClass();
+        Class<?> valueType = value.getClass();
         if (valueType.isEnum())
         {
-            av.visitEnum(attribute.getName(), Type.getDescriptor(valueType), ((Enum< ? >) value).name());
+            av.visitEnum(attribute.getName(), Type.getDescriptor(valueType), ((Enum<?>) value).name());
+            return;
         }
-        else if (isEnumArray(valueType))
+
+        if (isEnumArray(valueType))
         {
             String type = Type.getDescriptor(valueType.getComponentType());
             AnnotationVisitor array = av.visitArray(attribute.getName());
-            Enum< ? >[] enums = (Enum< ? >[]) value;
-            for (Enum< ? > e : enums)
+            Enum<?>[] enums = (Enum<?>[]) value;
+            for (Enum<?> e : enums)
             {
                 array.visitEnum(null, type, e.name());
             }
             array.visitEnd();
+            return;
         }
-        else
+
+        final String name = attribute.getName();
+        final AnnotationDescriptor ann = asAnnotation(value);
+        if (ann != null)
         {
-            av.visit(attribute.getName(), value);
+            visitSubAnnotation(av, name, ann);
+            return;
         }
+
+        if (isAnnotationArray(valueType))
+        {
+            AnnotationVisitor arr = av.visitArray(attribute.getName());
+            for (Object o : (Object[]) value)
+            {
+                visitSubAnnotation(arr, null, asAnnotation(o));
+            }
+            arr.visitEnd();
+            return;
+        }
+
+        av.visit(attribute.getName(), value);
     }
 
-    private boolean isEnumArray(Class< ? extends Object> valueType)
+    private void visitSubAnnotation(final AnnotationVisitor visitor, final String name, final AnnotationDescriptor ann)
+    {
+        final AnnotationVisitor subVisitor = visitor.visitAnnotation(name,
+                                                                     Type.getDescriptor(ann.getType()));
+        processAnnotation(ann, subVisitor);
+    }
+
+    private AnnotationDescriptor asAnnotation(Object value)
+    {
+        if (value instanceof AnnotationDescriptor)
+        {
+            return (AnnotationDescriptor) value;
+        }
+        if (value instanceof AnnotationSpec)
+        {
+            return ((AnnotationSpec) value).create();
+        }
+        return null;
+    }
+
+    private boolean isEnumArray(Class<? extends Object> valueType)
     {
         return valueType.isArray() && valueType.getComponentType().isEnum();
+    }
+
+    private boolean isAnnotationArray(Class<? extends Object> valueType)
+    {
+        return valueType.isArray() && isAnnotationDescriptor(valueType.getComponentType());
+    }
+
+    private boolean isAnnotationDescriptor(final Class<?> ct)
+    {
+        return AnnotationDescriptor.class.isAssignableFrom(ct)
+                || AnnotationSpec.class.isAssignableFrom(ct);
     }
 
     private boolean isStatic(MethodDescriptor method)
