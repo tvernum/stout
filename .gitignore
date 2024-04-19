@@ -1,0 +1,10 @@
+lib
+output
+samples
+*.swp
+ignore-*
+.settings
+.classpath
+.project
+.hgignore
+.hg
